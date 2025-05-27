@@ -12,7 +12,7 @@
 ### Priority 1
 
 - **Data Ingestion Hub**
-  - Integration with OpenWeatherMap API
+  - Integration with OpenWeatherMap API (Tentative)
   - Sensor data parser (CSV/MQTT)
   - ETA feed connector
   - Data normalization pipeline
@@ -28,15 +28,10 @@
   - Action log with timestamps
   - Visual transit status
 
-- **Playbook Execution**
+- **Risk Alerts**
   - Automated action execution (Slack, SMS, email)
-  - Tracking whether actions were performed
-  - Basic playbook templates (temp spike, delay, weather event)
-
-- **ML-Powered Anomaly Detection**
-  - LSTM-based model with 4–12 hour forecasting window
-  - Anomaly scoring and alert generation
-  - Integration with rule engine
+  - Mitigation Suggestion
+  - Summary Report
 
 ### Priority 2: Should Have
 
@@ -54,3 +49,8 @@
 
 - **Edge Computing Compatibility**
   - Offline fallback and local predictions when internet fails
+
+- **ML-Powered Anomaly Detection**
+  - LSTM-based model with 4–12 hour forecasting window
+  - Anomaly scoring and alert generation
+  - Integration with rule engine
