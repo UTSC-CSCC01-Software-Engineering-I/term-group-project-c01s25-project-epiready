@@ -2,7 +2,19 @@
 
 ## Project Overview
 
+EpiReady is a disease intelligence platform with three long-term goals:
 
+- Outbreak Prediction – When and where diseases are likely to emerge
+- Cold Chain Risk Detection – Flag risks in transporting sensitive medical
+products
+- Pathogen Evolution Tracking – Detect and respond to disease mutations to
+support drug repurposing
+
+We are currently focusing on cold chain logistics for MVP development. The MVP helps diagnostic labs, vaccine manufacturers, and biotech distributors prevent cold chain failures using a lightweight, rule-based risk alert system. Some of the core fatures include
+
+- Location and weather map
+- Rule builder for email/text alerts
+- Realtime status dashboard for transports
 
 ## Installation Instructions
 
@@ -54,6 +66,7 @@ We follow the Git Flow branching strategy:
 
 ### Ticketing and Issue Management
 
+Any new bugs found will be ticketed to Github Issues which will then be linked to the ticket in JIRA as well. Main and develop branches have rulesets added and any changes there must be reviewed by another member before being pushed.
 
 ## Contributing
 
