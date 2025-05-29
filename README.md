@@ -10,7 +10,7 @@ products
 - Pathogen Evolution Tracking – Detect and respond to disease mutations to
 support drug repurposing
 
-We are currently focusing on cold chain logistics for MVP development. The MVP helps diagnostic labs, vaccine manufacturers, and biotech distributors prevent cold chain failures using a lightweight, rule-based risk alert system. Some of the core fatures include
+We are currently focusing on cold chain logistics for MVP development. The MVP helps diagnostic labs, vaccine manufacturers, and biotech distributors prevent cold chain failures using a lightweight, rule-based risk alert system. Some of the core features include
 
 - Location and weather map
 - Rule builder for email/text alerts
