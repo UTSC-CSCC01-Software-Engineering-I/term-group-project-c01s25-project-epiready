@@ -4,10 +4,45 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+@font-face {
+  font-family: 'Unageo';
+  src: url('./assets/ttf/Unageo-Regular.ttf') format('truetype');
+  font-weight: 300;
+}
+@font-face {
+  font-family: 'Unageo';
+  src: url('./assets/ttf/Unageo-Light.ttf') format('truetype');
   font-weight: 400;
+}
+@font-face {
+  font-family: 'Unageo';
+  src: url('./assets/ttf/Unageo-Medium.ttf') format('truetype');
+  font-weight: 500;
+}
+@font-face {
+  font-family: 'Unageo';
+  src: url('./assets/ttf/Unageo-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Unageo';
+  src: url('./assets/ttf/Unageo-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Unageo';
+  src: url('./assets/ttf/Unageo-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+}
+@font-face {
+  font-family: 'Unageo';
+  src: url('./assets/ttf/Unageo-Black.ttf') format('truetype');
+  font-weight: 900;
+}
+
+:root {
+  font-family: 'Unageo', system-ui, sans-serif;
+  line-height: 1.5;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
