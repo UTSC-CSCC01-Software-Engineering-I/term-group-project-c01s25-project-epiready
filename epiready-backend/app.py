@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from routes.routes import blueprint
+from routes import all_blueprints
 
 app = Flask(__name__)
 app.secret_key = "SECRET_KEY"
@@ -10,7 +10,8 @@ CORS(app)
 def hello():
     return jsonify({"message": "Hello from backend!"})
 
-app.register_blueprint(blueprint, url_prefix="/api/auth")
+for blueprint, prefix in all_blueprints:
+    app.register_blueprint(blueprint, url_prefix=prefix)
 
 if __name__ == '__main__':
     app.run(debug=True)
