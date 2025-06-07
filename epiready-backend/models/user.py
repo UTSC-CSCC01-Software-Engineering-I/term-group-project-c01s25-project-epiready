@@ -1,13 +1,27 @@
+from config.database import db
+from datetime import datetime, timezone
 import bcrypt
 
-users = []
+class User(db.Model):
+    __tablename__ = "users"
 
-def create_user(email: str, password: str) -> None:
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    users.append({"email": email, "password": hashed})
+    id            = db.Column(db.Integer, primary_key=True)
+    email         = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    created_at    = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
-def verify_user(email: str, password: str) -> bool:
-    verified_username = next((u for u in users if u["email"] == email), None)
-    if not verified_username:
+    def to_dict(self):
+        return {"id": self.id, "email": self.email, "created_at": self.created_at.isoformat()}
+
+def create_user(email: str, raw_password: str) -> User:
+    pw_hash = bcrypt.hashpw(raw_password.encode(), bcrypt.gensalt()).decode()
+    user = User(email=email, password_hash=pw_hash)
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+def verify_user(email: str, raw_password: str) -> bool:
+    user = User.query.filter_by(email=email).first()
+    if not user:
         return False
-    return bcrypt.checkpw(password.encode(), verified_username["password"])
+    return bcrypt.checkpw(raw_password.encode(), user.password_hash.encode())
