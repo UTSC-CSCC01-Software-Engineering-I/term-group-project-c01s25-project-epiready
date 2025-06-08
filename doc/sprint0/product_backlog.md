@@ -1,0 +1,22 @@
+## Product Backlog
+
+- As a transporter, I need to be able to track my real time location in a map
+- As a business owner, I need to be able to get alerts via email or text if there is a risk
+- As a business owner, I want to see a dashboard for visualizing status
+- As a business owner, I want to be able to see logs of recent alerts
+- As an admin, I need to be able to manually override alerts
+- As an admin, I need to be able to set up my own custom alerts using different conditions
+- As a business owner, I need real time updates of weather conditions
+- As a business owner, the website should be easy to navigate
+- As a business owner, I need to be able to look at weather conditions in a map
+- As a business owner, I want a personal login to access features exclusively for me
+- As a transporter, I need a personal login to access my features
+- As a founder, I should be able to work with another team and add features easily
+- As a founder, I want to add new ML models I'm developing to the app
+- As a founder, I want to normalize any data to use it for training my models
+- As a business owner, I want clean and clear documentation for the app.
+- As a business owner, I want a visually appealing design for the app.
+- As a business owner, I want to identify the types of end users of the app
+- As a business owner, I need to be able to change my password
+- As a transporter, I need to be able to change my password
+- As a business owner, I need to be able to look at transporters' live locations
