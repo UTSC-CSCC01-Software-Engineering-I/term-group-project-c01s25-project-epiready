@@ -5,15 +5,20 @@ import bcrypt
 class User(db.Model):
     __tablename__ = "users"
 
-    id            = db.Column(db.Integer, primary_key=True)
-    email         = db.Column(db.String(120), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    created_at    = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     def to_dict(self):
         return {"id": self.id, "email": self.email, "created_at": self.created_at.isoformat()}
 
 def create_user(email: str, raw_password: str) -> User:
+    existing_user = User.query.filter_by(email=email).first()
+    
+    if existing_user:
+        return None
+    
     pw_hash = bcrypt.hashpw(raw_password.encode(), bcrypt.gensalt()).decode()
     user = User(email=email, password_hash=pw_hash)
     db.session.add(user)
@@ -24,4 +29,8 @@ def verify_user(email: str, raw_password: str) -> bool:
     user = User.query.filter_by(email=email).first()
     if not user:
         return False
-    return bcrypt.checkpw(raw_password.encode(), user.password_hash.encode())
+    
+    if bcrypt.checkpw(raw_password.encode(), user.password_hash.encode()):
+        return user
+    
+    return False
