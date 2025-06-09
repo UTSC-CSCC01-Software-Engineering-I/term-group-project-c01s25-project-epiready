@@ -1,0 +1,160 @@
+.cardContainer {
+    width: calc(min(70vh, 95vw));
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    margin-left: 1vh;
+    margin-right: 1vh;
+    height: 15vh;
+    perspective: 1000px;
+    border-radius: 10px;
+}
+
+.cardContent {
+    width: 100%;
+    min-height: 160px;
+    height: auto;
+    padding: 0%;
+    display: flex;
+}
+
+.Notice {
+    border: 3px solid green;
+    box-shadow: 0 0 10px rgba(0, 175, 44, 0.5);
+}
+
+.Warning {
+    border: 3px solid orange;
+    box-shadow: 0 0 10px rgba(255, 154, 3, 0.89);
+}
+
+.Critical {
+    border: 3px solid red;
+    box-shadow: 0 0 15px rgba(216, 6, 6, 0.5);
+}
+
+.cardHeader{
+    width: auto;
+    min-height: 35px;
+    height:auto;
+    padding: 1vh;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cardView{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.message {
+    height: auto;
+    overflow: visible;
+    text-align: center;
+    width: 100%;
+    font-size: 1.2em;
+    padding-left: 1.5vh;
+    padding-bottom: 1vh;
+    padding-right: 1.5vh;
+}
+
+.deleteBtn{
+    padding:0%;
+    margin-right: 7px;
+    margin-top: 6px;
+    background-image: url("../../assets/x-button.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 19px;
+    width: 19px;
+    transition: all 0.5s;
+    /* width: calc(1/8 * 100%); */
+}
+
+.deleteBtn:hover{
+    cursor: pointer;
+    transform: scale(1.2);
+}
+
+.date{
+    margin-top: 1vh;
+    color: #b9b9b9;
+}
+
+
+
+.msgType {
+    font-size: 1.4em;
+    font-weight: bold;
+    padding-left: 1vh;
+    padding-top: 0.5vh;
+    /* width: calc(16/24 * 100%); */
+}
+
+.cardFront {
+    position: absolute;
+    overflow-y: visible;
+    backface-visibility: hidden; 
+    width: 100%;
+    height: 15vh;
+    display: flex;
+    flex-direction: row;
+    padding-top: 0%;
+}
+
+
+.card{
+    width: 100%;
+    height: 15vh;
+    transform-style: preserve-3d;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.85);
+    border-radius: 20px;
+    overflow: visible;
+}
+
+.cardBack {
+    position: absolute;
+    backface-visibility: hidden;
+    transform: rotateY(180deg); 
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.confirmation{
+    width: 100%;
+    height: 70%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.yesBtn{
+    background-color: rgb(9, 107, 9);
+    font-size: 1.2em;
+    width: 15%;
+    height: 60%;
+    padding: 1%;
+}
+
+.noBtn{
+    background-color: rgb(194, 0, 0);
+    font-size: 1.2em;
+    height: 60%;
+    padding: 1%;
+    width: 15%;
+}
+
+.backMsg{
+    font-size: 1.2em;
+    height: 40%;
+    font-weight: 400;
+    width: 100%;
+    margin: 2%;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+}

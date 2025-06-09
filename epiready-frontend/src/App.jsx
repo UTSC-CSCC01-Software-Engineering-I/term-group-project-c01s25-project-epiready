@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 import AuthForm from "./pages/AuthenticationForm";
+import ActionLog from './components/ActionLog/ActionLog';
+import ShowLogs from "./components/ActionLog/ShowLogs";
 import Home from "./pages/Home";
 import Credits from "./pages/Credits";
 import Track from "./pages/Track";
@@ -11,6 +13,7 @@ import Alerts from "./pages/Alerts";
 export default function App() {
   return (
     <BrowserRouter>
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthForm type="login" />} />
