@@ -1,5 +1,5 @@
 import { use, useEffect, useState } from "react";
-import ActionLog from "../components/ActionLog/ActionLog";
+import ActionLog from "./ActionLog.jsx";
 
 export default function ShowLogs(){
     const [logs, setLogs] = useState([]);
