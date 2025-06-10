@@ -14,7 +14,7 @@
     height: auto;
     transform-style: preserve-3d;
     color: #fff;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.25);
     border-radius: 0.75em;
     overflow: visible;
     position: relative;
@@ -155,23 +155,23 @@
 }
 
 .Notice {
-    border: 0.19em solid green;
-    box-shadow: 0 0 0.63em rgba(0, 175, 44, 0.5);
+    border: 0.07em solid green;
+    box-shadow: 0 0 0.4em rgba(0, 175, 44, 0.5);
 }
 
 .Warning {
-    border: 0.19em solid yellow;
-    box-shadow: 0 0 0.63em rgba(250, 230, 0, 0.89);
+    border: 0.08em solid yellow;
+    box-shadow: 0 0 0.6em rgba(250, 230, 0, 0.6);
 }
 
 .Severe {
-    border: 0.19em solid orange;
-    box-shadow: 0 0 0.94em rgb(255, 170, 0);
+    border: 0.09em solid orange;
+    box-shadow: 0 0 0.6em rgb(255, 170, 0.7);
 }
 
 .Critical {
-    border: 0.19em solid red;
-    box-shadow: 0 0 0.94em rgba(216, 6, 6, 0.5);
+    border: 0.2em solid red;
+    box-shadow: 0 0 1.2em rgba(216, 6, 6, 0.8);
 }
 
 @media (max-width: 600px) {
