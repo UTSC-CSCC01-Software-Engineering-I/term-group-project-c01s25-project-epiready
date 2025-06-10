@@ -10,6 +10,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
+    shipments = db.relationship('Shipment', backref='user', lazy=True)
+
     def to_dict(self):
         return {"id": self.id, "email": self.email, "created_at": self.created_at.isoformat()}
 
