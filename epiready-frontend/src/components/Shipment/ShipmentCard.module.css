@@ -1,0 +1,165 @@
+.shipmentCard {
+    width: 100%;
+    padding: 0.5em 1em 1em 0.75em;
+    background-color: rgba(0,0,0,0.5);
+    position: relative;
+    border-radius: 0.75em;
+    flex-basis: 45%;
+    display: flex;
+    flex-shrink: 1;
+    flex-direction: column;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+.shipmentSections {
+    display: flex;
+    overflow: hidden;
+    flex-direction: row; /* sections side by side */
+    width: 100%;
+    height: auto;
+    gap: 1em;
+}
+
+
+.shipmentOnTrack {
+    box-shadow: 1px 3px 5px rgb(8, 154, 8);
+    
+}
+
+.shipmentWarning {
+    box-shadow: 1px 3px 5px rgb(220, 228, 0);
+}
+.shipmentCritical {
+    box-shadow: 1px 3px 5px rgb(255, 0, 0);
+}
+.shipmentSevere {
+    box-shadow: 1px 3px 5px rgb(255, 128, 0);
+}
+
+.shipmentName{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.1em 0.25em; /* Add internal padding to each section */
+    box-sizing: border-box;
+    flex-basis: calc(2/12 * 100%);
+}
+
+.shipmentLocation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.1em 0.25em; /* Add internal padding to each section */
+    box-sizing: border-box;
+    flex-basis: calc(3/12 * 100%);
+}
+
+.shipmentDescription {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.1em 0.25em; /* Add internal padding to each section */
+    box-sizing: border-box;
+    flex-basis: calc(5/12 * 100%);
+}
+.shipmentStatus {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.1em 0.25em; /* Add internal padding to each section */
+    box-sizing: border-box;
+    flex-basis: calc(2/12 * 100%);
+}
+
+
+.title {
+    min-width: 6em;
+    font-weight: 700;
+    text-decoration: underline;
+    color: #3374ff;
+    font-size: 1.08em;
+    margin-right: 0.5em;
+}
+
+.content {
+    flex: 1 1 0;
+    margin-top: 0.4em;
+    font-weight: 600;
+    color: #ffff;
+    font-size: 1em;
+    word-break: break-word;
+}
+
+
+.collapsed {
+    max-height: 8em;
+    overflow: hidden;
+}
+.expanded {
+    max-height: none; /* or a large px value */
+}
+
+.readMoreBtn {
+    background: none;
+    border: none;
+    color: #037815;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 0.5em;
+    align-self: center;
+    text-decoration: underline;
+    padding: 0.2em 0.5em;
+}
+
+
+
+.onTrack {
+    color: #089a08;
+    font-weight: 900;
+    font-size: 1.2em;
+}
+
+.warning{
+    color: #dce400;
+    font-weight: 900;
+    font-size: 1.2em;
+}
+.critical {
+    color: #ff0000;
+    font-weight: 900;
+    font-size: 1.2em;
+}
+.severe{
+    color: #ff8000;
+    font-weight: 900;
+    font-size: 1.2em;
+}
+
+
+@media (max-width: 600px) {
+    .shipmentCard {
+        padding: 0.7em 0.5em;
+        font-size: 0.98em;
+        flex-direction: column;
+        flex-basis: 100%;
+    }
+    .shipmentSections {
+        flex-direction: column;
+        font-size: 0.98em;
+        gap: 0.3em;
+        max-height: none;
+    }
+    .title {
+        min-width: 4em;
+        font-size: 1em;
+    }
+
+    .shipmentName,
+    .shipmentLocation,
+    .shipmentDescription,
+    .shipmentStatus {
+        margin: 0em 0.1em;
+        padding: 0.1em;
+    }
+}
