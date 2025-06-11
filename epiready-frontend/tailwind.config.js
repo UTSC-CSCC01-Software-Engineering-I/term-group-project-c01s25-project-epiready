@@ -6,5 +6,10 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar')({
+            nocompatible: true,
+            preferredStrategy: 'pseudoelements',
+        }),
+  ],
 }
