@@ -33,11 +33,11 @@ export default function ShipmentCard({ shipment }) {
             const scrollHeight = sectionsRef.current.scrollHeight;
             sectionsRef.current.style.maxHeight = prevMaxHeight;
 
-            setIsOverflowing(scrollHeight > 112); // 112px = 7em approx
+            setIsOverflowing(scrollHeight > 110); // 112px = 7em approx
             if (expanded) {
                 setMaxHeight(scrollHeight + "px");
             } else {
-                setMaxHeight("100px");
+                setMaxHeight("110px");
             }
         }
     }, [shipment, expanded]);

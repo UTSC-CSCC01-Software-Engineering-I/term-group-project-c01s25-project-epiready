@@ -19,7 +19,7 @@ export default function ShowShipments() {
         setShipments([
             { id: 4, name: "Shipment 3", location: "Location C", description: "Description C", statusCode: 3 },
             { id: 1, name: "Shipment 1", location: "Location A", description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis dicta possimus voluptatum ipsum veritatis minus at blanditiis, ex, tenetur, dolorem accusamus nihil distinctio cupiditate dolores quidem illo assumenda illum! Reprehenderit.", statusCode: 0 },
-            { id: 2, name: "Shipment 2", location: "Location B", description: "Description B", statusCode: 1 },
+            { id: 2, name: "Shipment 2", location: "Location B", description: "Shipment is carryin 10000 kg of steel rods to show it in your mouth", statusCode: 1 },
             { id: 3, name: "Shipment 3", location: "Location C", description: "Description C", statusCode: 2 },
             
         ]);
@@ -33,7 +33,7 @@ export default function ShowShipments() {
     }, [shipments]);
 
     return (
-        <div style={{width: "100%", display: "flex", flexWrap: "wrap", rowGap: "2em", columnGap: "2.5%", justifyContent: "center"}}>
+        <div className={styles.shipmentsContainer}>
             {addShipment}
             {shipmentComponents}
         </div>

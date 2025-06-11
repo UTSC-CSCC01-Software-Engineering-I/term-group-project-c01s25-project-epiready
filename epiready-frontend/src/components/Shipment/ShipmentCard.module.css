@@ -23,17 +23,18 @@
 
 
 .shipmentOnTrack {
-    box-shadow: 0 3px 5px rgb(8, 154, 8);
+    box-shadow: 1px 3px 5px rgb(8, 154, 8);
+    
 }
 
 .shipmentWarning {
-    box-shadow: 0 3px 5px rgb(220, 228, 0);
+    box-shadow: 1px 3px 5px rgb(220, 228, 0);
 }
 .shipmentCritical {
-    box-shadow: 0 3px 5px rgb(255, 0, 0);
+    box-shadow: 1px 3px 5px rgb(255, 0, 0);
 }
 .shipmentSevere {
-    box-shadow: 0 3px 5px rgb(255, 128, 0);
+    box-shadow: 1px 3px 5px rgb(255, 128, 0);
 }
 
 .shipmentName{
@@ -138,10 +139,16 @@
 
 @media (max-width: 600px) {
     .shipmentCard {
-        max-width: 98vw;
         padding: 0.7em 0.5em;
         font-size: 0.98em;
         flex-direction: column;
+        flex-basis: 100%;
+    }
+    .shipmentSections {
+        flex-direction: column;
+        font-size: 0.98em;
+        gap: 0.3em;
+        max-height: none;
     }
     .title {
         min-width: 4em;
@@ -152,6 +159,7 @@
     .shipmentLocation,
     .shipmentDescription,
     .shipmentStatus {
-        margin: 0.3em 0.1em;
+        margin: 0em 0.1em;
+        padding: 0.1em;
     }
 }
