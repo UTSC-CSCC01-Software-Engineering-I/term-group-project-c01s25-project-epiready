@@ -7,7 +7,7 @@ class Alert(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     shipment_id = db.Column(db.String(50), db.ForeignKey('shipments.id'), nullable=False)
-    type = db.Column(db.String(20), nullable=False)  # temperature, weather, eta
+    type = db.Column(db.String(20), nullable=False)
     severity = db.Column(db.String(10), nullable=False)  # low, medium, high
     message = db.Column(db.String(200), nullable=False)
     status = db.Column(db.String(20), nullable=False)  # active, inprogress, resolved
@@ -42,8 +42,8 @@ class ActionLog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     alert_id = db.Column(db.Integer, db.ForeignKey('alerts.id'), index=True, nullable=False)
-    action_type = db.Column(db.String(50), nullable=False)  # email, sms, slack, manual_override
-    status = db.Column(db.String(20), nullable=False)  # pending, completed, failed
+    action_type = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(20), nullable=False)  # pending, inprogress, completed
     details = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False)
     completed_at = db.Column(db.DateTime)

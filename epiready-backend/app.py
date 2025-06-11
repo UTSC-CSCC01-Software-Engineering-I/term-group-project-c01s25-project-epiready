@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from config.database import init_db
 import os
 
+from models import user, shipment, temperature, alert, weather
+
 load_dotenv()
 
 app = Flask(__name__)
