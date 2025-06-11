@@ -57,6 +57,6 @@ def login():
     
     if user:
         token = generate_token(user.id)
-        return jsonify({"message": "Login successful!", "token": token}), 200
+        return jsonify({"message": "Login successful!", "token": token, "user_id": user.id}), 200
     
     return jsonify({"error": "Wrong username/password"}), 401
