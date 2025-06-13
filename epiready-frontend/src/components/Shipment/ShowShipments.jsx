@@ -1,5 +1,6 @@
 import { use, useEffect, useState } from "react";
 import ShipmentCard from "./ShipmentCard";
+import AddShipmentPopup from "./AddShipmentPopup";
 import styles from "./AddShipment.module.css";
 
 export default function ShowShipments() {
@@ -8,9 +9,7 @@ export default function ShowShipments() {
 
     const addShipment = (
         <div className={styles.addShipment}>
-            <div className={styles.addShipmentButton}>
-                +
-            </div>
+            <AddShipmentPopup />
         </div>
     )
 
