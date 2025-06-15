@@ -19,12 +19,15 @@ export default function ShowShipments() {
         fetch("http://127.0.0.1:5000/api/shipments/", {
         method: "GET",
         headers: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3NDk4NjY2NTAsImlhdCI6MTc0OTg2MzA1MH0.trvBfxsfH0GjJZMxEvPw829BQ5RwJJ77n9lqcYNRbfc',
+            'Authorization': sessionStorage.getItem("token"),
             'Content-Type': 'application/json'
         }
         })
-        .then((res) => {return res.json()})
+        .then((res) => {
+            console.log(res);
+            return res.json();})
         .then(res => {
+            console.log(res);
             setShipments(res);
         });
     }, []);

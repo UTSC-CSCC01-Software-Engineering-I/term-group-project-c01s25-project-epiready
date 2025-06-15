@@ -64,12 +64,12 @@ export default function ShipmentCard({ shipment }) {
                 }}
             >
                 <div className={classes.shipmentName}>
-                    <div className={classes.title}>Name</div>
-                    <div className={classes.content}>{shipment.name}</div>
+                    <div className={classes.title}>Product</div>
+                    <div className={classes.content}>{shipment.product_type}</div>
                 </div>
                 <div className={classes.shipmentLocation}>
-                    <div className={classes.title}>Location</div>
-                    <div className={classes.content}>{shipment.location}</div>
+                    <div className={classes.title}>Destination</div>
+                    <div className={classes.content}>{shipment.destination}</div>
                 </div>
                 <div className={classes.shipmentDescription}>
                     <div className={classes.title}>Description</div>
