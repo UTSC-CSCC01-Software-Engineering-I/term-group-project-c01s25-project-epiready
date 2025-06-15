@@ -9,11 +9,12 @@ import Track from "./pages/Track";
 import Shipments from "./pages/Shipments";
 import Monitor from "./pages/Monitor";
 import Alerts from "./pages/Alerts";
+import { GlobalProvider } from "./LoggedIn";
 
 export default function App() {
   return (
+    <GlobalProvider>
     <BrowserRouter>
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthForm type="login" />} />
@@ -25,5 +26,7 @@ export default function App() {
         <Route path="/alerts" element={<Alerts />} />
       </Routes>
     </BrowserRouter>
+    <div id="popup-root" />
+    </GlobalProvider>
   );
 }

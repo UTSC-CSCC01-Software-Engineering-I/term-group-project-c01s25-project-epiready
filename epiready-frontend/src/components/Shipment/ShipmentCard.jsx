@@ -11,15 +11,15 @@ export default function ShipmentCard({ shipment }) {
     let boxColor = classes.shipmentOnTrack;
     let statusMsg = "On Track";
 
-    if (shipment.statusCode === 1) {
+    if (shipment.status === "Warning") {
         statusColor = classes.warning;
         statusMsg = "Warning";
         boxColor = classes.shipmentWarning;
-    } else if (shipment.statusCode === 2) {
+    } else if (shipment.statusCode === "Severe") {
         statusColor = classes.severe;
         statusMsg = "Severe";
         boxColor = classes.shipmentSevere;
-    } else if (shipment.statusCode === 3) {
+    } else if (shipment.status === "Critical") {
         statusColor = classes.critical;
         statusMsg = "Critical";
         boxColor = classes.shipmentCritical;
@@ -64,16 +64,18 @@ export default function ShipmentCard({ shipment }) {
                 }}
             >
                 <div className={classes.shipmentName}>
-                    <div className={classes.title}>Name</div>
-                    <div className={classes.content}>{shipment.name}</div>
+                    <div className={classes.title}>Product</div>
+                    <div className={classes.content}>{shipment.product_type}</div>
                 </div>
                 <div className={classes.shipmentLocation}>
-                    <div className={classes.title}>Location</div>
-                    <div className={classes.content}>{shipment.location}</div>
+                    <div className={classes.title}>Destination</div>
+                    <div className={classes.content}>{shipment.destination}</div>
                 </div>
                 <div className={classes.shipmentDescription}>
                     <div className={classes.title}>Description</div>
-                    <div className={classes.content}>{shipment.description}</div>
+                    <div className={classes.content}>The shipment has {shipment.aqi_sensitivity} aqi sensitivity 
+                        and {shipment.humidity_sensitivity} humidity sensitivity and is being carried
+                        on a {shipment.mode_of_transport}</div>
                 </div>
                 <div className={classes.shipmentStatus}>
                     <div className={classes.title}>Status</div>

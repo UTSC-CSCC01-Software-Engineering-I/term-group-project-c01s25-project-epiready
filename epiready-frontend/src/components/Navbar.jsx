@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import NavbarLink from "./NavbarLink";
+import SignupPopup from "./signup-login/signup";
+import LoginPopup from "./signup-login/login";
+import { hover } from "framer-motion";
 
 export default function Navbar({ currentPage }) {
   return (
@@ -23,6 +26,10 @@ export default function Navbar({ currentPage }) {
         <NavbarLink to="/monitor" currentPage={currentPage}>
           Monitor
         </NavbarLink>
+        <SignupPopup trigger={<button className="hover:bg-green-600 hover:text-black" style={{border: "2px solid green", 
+          fontWeight:"600", margin: "2px", padding: "5px", borderRadius: "10%", minWidth: "70px"}}>Sign up</button>}/>
+        <LoginPopup trigger={<button className="hover:bg-green-600 hover:text-black" style={{border: "2px solid green", 
+          fontWeight:"600", padding: "5px", margin: "2px", borderRadius: "10%", minWidth: "70px"}}>Log In</button>}/>
       </div>
     </nav>
   );
