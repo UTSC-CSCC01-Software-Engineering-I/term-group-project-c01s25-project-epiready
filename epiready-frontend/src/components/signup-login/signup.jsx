@@ -33,8 +33,8 @@ export default function SignupPopup({ trigger }) {
           } else {
               setSignedUp(true);
               setMessage("Signed up successfully");
-              setSignupError(false);
           }
+          setSignupError(false);
       });
   }
 
@@ -85,6 +85,7 @@ export default function SignupPopup({ trigger }) {
               Sign Up
             </button>
           </form>
+          {signedUp && <div>{message}</div>}
         </div>
       )}
     </Popup>
