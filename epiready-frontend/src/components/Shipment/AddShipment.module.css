@@ -47,6 +47,24 @@
     padding-right: 0.5em;
 }
 
+:global(.shipmentPopup-content) {
+  margin: auto;
+}
+:global(.shipmentPopup-arrow) {
+  color: rgb(255, 255, 255);
+}
+:global([role='tooltip'].shipmentPopup-content) {
+  width: 200px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
+}
+
+:global(.shipmentPopup-overlay) {
+  background: rgba(0, 0, 0, 0.5);
+}
+:global([data-popup='tooltip'].shipmentPopup-overlay) {
+  background: transparent;
+}
+
 @media (max-width: 600px) {
     .addShipment {
         flex-basis: 100%;
