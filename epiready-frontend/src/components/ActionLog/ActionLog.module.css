@@ -1,0 +1,227 @@
+.cardContainer {
+    width: calc(min(70vh, 95vw));
+    margin: 2vh 1vh;
+    min-height: 7.5em;
+    height: auto;
+    perspective: 1000px;
+    border-radius: 0.625em;
+    box-sizing: border-box;
+}
+
+.card {
+    width: 100%;
+    min-height: 7.5em;
+    height: auto;
+    transform-style: preserve-3d;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 0.75em;
+    overflow: visible;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.cardFront, .cardBack {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 7.5em;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    backface-visibility: hidden;
+    box-sizing: border-box;
+}
+
+.cardFront {
+    z-index: 2;
+}
+
+.cardBack {
+    transform: rotateY(180deg);
+    z-index: 1;
+}
+
+.cardView {
+    width: 100%;
+    min-height: 7.5em;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+}
+
+.cardHeader {
+    width: 100%;
+    min-height: 2.2em;
+    height: auto;
+    padding: 1vh;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.cardContent {
+    width: 100%;
+    min-height: 3.75em;
+    height: auto;
+    padding: 0;
+    display: flex;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+}
+
+.message {
+    width: 100%;
+    font-size: 1.35em;
+    padding: 0.4vh 0.7em 1.2vh 0.7em;
+    word-break: break-word;
+    white-space: pre-line;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    overflow-wrap: break-word;
+    text-align: center;
+}
+
+.deleteBtn {
+    padding: 0;
+    margin-right: 0.44em;
+    background-image: url("../../assets/x-button.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 1.2em;
+    width: 1.2em;
+    transition: all 0.5s;
+}
+
+.deleteBtn:hover {
+    cursor: pointer;
+    transform: scale(1.2);
+}
+
+.date {
+    margin-top: 1vh;
+    color: #b9b9b9;
+}
+
+.msgType {
+    font-size: 1.4em;
+    font-weight: bold;
+    padding-left: 1vh;
+    padding-top: 0.5vh;
+}
+
+.confirmation {
+    width: 100%;
+    min-height: 2.5em;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.yesBtn, .noBtn {
+    font-size: 1.2em;
+    width: 15%;
+    min-width: 4.4em;
+    height: 2.5em;
+    padding: 1%;
+    color: #fff;
+    border: none;
+    border-radius: 0.25em;
+    cursor: pointer;
+}
+
+.yesBtn {
+    background-color: rgb(9, 107, 9);
+}
+
+.noBtn {
+    background-color: rgb(194, 0, 0);
+}
+
+.backMsg {
+    font-size: 1.2em;
+    min-height: 2.5em;
+    font-weight: 400;
+    width: 100%;
+    margin: 2%;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+}
+
+.Notice {
+    border: 0.07em solid green;
+    box-shadow: 0 0 0.4em rgba(0, 175, 44, 0.5);
+}
+
+.Warning {
+    border: 0.08em solid yellow;
+    box-shadow: 0 0 0.6em rgba(250, 230, 0, 0.6);
+}
+
+.Severe {
+    border: 0.09em solid orange;
+    box-shadow: 0 0 0.6em rgb(255, 170, 0.7);
+}
+
+.Critical {
+    border: 0.2em solid red;
+    box-shadow: 0 0 1.2em rgba(216, 6, 6, 0.8);
+}
+
+@media (max-width: 600px) {
+    .cardContainer {
+        width: 95vw;
+        min-width: 0;
+        max-width: 100vw;
+    }
+    .cardHeader {
+        min-height: 1.9em;
+        font-size: 0.9em;
+    }
+    .card, .cardView, .cardFront, .cardBack {
+        min-height: 8.1em;
+        font-size: 1em;
+    }
+    .message {
+        font-size: 1em;
+        padding: 0.1em;
+    }
+}
+
+@media (min-width: 2560px) {
+    .cardContainer {
+        min-height: 10em;
+    }
+    .card, .cardView, .cardFront, .cardBack {
+        min-height: 10em;
+    }
+    .cardHeader {
+        min-height: 3em;
+        font-size: 1.1em;
+        padding: 0.5em 1em;
+    }
+    .cardContent {
+        min-height: 5em;
+    }
+    .message {
+        font-size: 1.5em;
+        padding: 0.5em 0.5em 0.7em 0.5em; /* reduced padding */
+    }
+    .deleteBtn {
+        height: 1.5em;
+        width: 1.5em;
+    }
+    .confirmation {
+        min-height: 3em;
+    }
+    .backMsg {
+        font-size: 1.3em;
+        min-height: 3em;
+    }
+}

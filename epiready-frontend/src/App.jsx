@@ -1,18 +1,32 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+
 import AuthForm from "./pages/AuthenticationForm";
+import ActionLog from './components/ActionLog/ActionLog';
+import ShowLogs from "./components/ActionLog/ShowLogs";
+import Home from "./pages/Home";
+import Credits from "./pages/Credits";
+import Track from "./pages/Track";
+import Shipments from "./pages/Shipments";
+import Monitor from "./pages/Monitor";
+import Alerts from "./pages/Alerts";
+import { GlobalProvider } from "./LoggedIn";
 
 export default function App() {
   return (
+    <GlobalProvider>
     <BrowserRouter>
-      <nav style={{ display: "flex", gap: 12 }}>
-        <Link to="/login">Login</Link>
-        <Link to="/signup">Signup</Link>
-      </nav>
-
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthForm type="login" />} />
         <Route path="/signup" element={<AuthForm type="signup" />} />
+        <Route path="/credits" element={<Credits />} />
+        <Route path="/track" element={<Track />} />
+        <Route path="/shipments" element={<Shipments />} />
+        <Route path="/monitor" element={<Monitor />} />
+        <Route path="/alerts" element={<Alerts />} />
       </Routes>
     </BrowserRouter>
+    <div id="popup-root" />
+    </GlobalProvider>
   );
 }
