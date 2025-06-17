@@ -1,6 +1,6 @@
 .cardContainer {
-    width: calc(min(70vh, 95vw));
-    margin: 2vh 1vh;
+    width: calc(min(800px, 95vw));
+    margin: 20px;
     min-height: 7.5em;
     height: auto;
     perspective: 1000px;
@@ -16,6 +16,7 @@
     color: #fff;
     background-color: rgba(0, 0, 0, 0.25);
     border-radius: 0.75em;
+    border: 1px solid oklch(43.9% 0 0);
     overflow: visible;
     position: relative;
     box-sizing: border-box;
@@ -57,10 +58,10 @@
     width: 100%;
     min-height: 2.2em;
     height: auto;
-    padding: 1vh;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
+    padding: 10px;
     display: flex;
-    justify-content: space-between;
+    justify-content: left;
+    gap: 10px;
     align-items: center;
     box-sizing: border-box;
 }
@@ -78,17 +79,18 @@
 .message {
     width: 100%;
     font-size: 1.35em;
-    padding: 0.4vh 0.7em 1.2vh 0.7em;
+    padding: 0 20px 10px;
     word-break: break-word;
     white-space: pre-line;
     box-sizing: border-box;
     flex: 1 1 auto;
     overflow-wrap: break-word;
-    text-align: center;
+    text-align: left;
 }
 
 .deleteBtn {
     padding: 0;
+    margin-left: auto;
     margin-right: 0.44em;
     background-image: url("../../assets/x-button.png");
     background-size: contain;
@@ -136,11 +138,22 @@
 }
 
 .yesBtn {
-    background-color: rgb(9, 107, 9);
+    border: #6b805e 2px solid;
+}
+
+.yesBtn:hover {
+    background-color: #4a5b44;
+    border: #4a5b44 2px solid;
 }
 
 .noBtn {
-    background-color: rgb(194, 0, 0);
+    background-color: #6b805e;
+    border: #6b805e 2px solid;
+}
+
+.noBtn:hover {
+    background-color: #4a5b44;
+    border: #4a5b44 2px solid;
 }
 
 .backMsg {
@@ -148,30 +161,34 @@
     min-height: 2.5em;
     font-weight: 400;
     width: 100%;
-    margin: 2%;
+    margin-top: 20px;
     align-self: center;
     justify-self: center;
     text-align: center;
 }
 
 .Notice {
-    border: 0.07em solid green;
+    /* border: 0.07em solid green; */
     box-shadow: 0 0 0.4em rgba(0, 175, 44, 0.5);
 }
 
 .Warning {
-    border: 0.08em solid yellow;
+    /* border: 0.08em solid yellow; */
     box-shadow: 0 0 0.6em rgba(250, 230, 0, 0.6);
 }
 
 .Severe {
-    border: 0.09em solid orange;
+    /* border: 0.09em solid orange; */
     box-shadow: 0 0 0.6em rgb(255, 170, 0.7);
 }
 
 .Critical {
-    border: 0.2em solid red;
+    /* border: 0.2em solid red; */
     box-shadow: 0 0 1.2em rgba(216, 6, 6, 0.8);
+}
+
+.Home {
+    border: none;
 }
 
 @media (max-width: 600px) {
@@ -190,7 +207,6 @@
     }
     .message {
         font-size: 1em;
-        padding: 0.1em;
     }
 }
 

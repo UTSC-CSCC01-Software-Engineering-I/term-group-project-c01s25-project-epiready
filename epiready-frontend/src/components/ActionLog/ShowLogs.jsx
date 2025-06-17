@@ -1,7 +1,7 @@
 import { use, useEffect, useState } from "react";
 import ActionLog from "./ActionLog";
 
-export default function ShowLogs(){
+export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
     const [logs, setLogs] = useState([]);
     const [logComponent, setLogComponent] = useState([]);
     const deleteLog = (id)  => {
@@ -12,8 +12,11 @@ export default function ShowLogs(){
     useEffect(() => {
         setLogComponent([]);
         let actions = [];
+        if(maxAlerts > 0 && logs.length > maxAlerts){
+            setLogs(logs.slice(0, maxAlerts));
+        }
         for(let i = 0; i < logs.length; i++){
-            actions.push(<ActionLog type={logs[i].type} onDestroy={deleteLog} msg={logs[i].message} id={logs[i].id} key={i}/>)
+            actions.push(<ActionLog type={logs[i].type} onDestroy={deleteLog} msg={logs[i].message} id={logs[i].id} key={i} isHome={isHome}/>)
         }
         setLogComponent(actions);
     }, [logs]);
