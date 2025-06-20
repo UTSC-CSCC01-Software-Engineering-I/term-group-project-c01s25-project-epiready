@@ -13,7 +13,7 @@ export default function ShowLogs(){
         setLogComponent([]);
         let actions = [];
         for(let i = 0; i < logs.length; i++){
-            actions.push(<ActionLog type={logs[i].type} onDestroy={deleteLog} msg={logs[i].message} id={logs[i].id} key={i}/>)
+            actions.push(<ActionLog type={logs[i].type} onDestroy={deleteLog} msg={logs[i].message} id={logs[i].id} key={logs[i].id}/>)
         }
         setLogComponent(actions);
     }, [logs]);
