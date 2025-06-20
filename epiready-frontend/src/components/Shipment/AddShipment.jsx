@@ -5,7 +5,6 @@ import "reactjs-popup/dist/index.css";
 export default function AddShipmentPopup({ trigger, setAdded }) {
   const [message, setMessage] = useState(null);
   const [addError, setAddError] = useState(false);
-  const [added, setAdd] = useState(false);
 
   const handleAdd = (e) => {
       e.preventDefault();
@@ -53,11 +52,10 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
           return res.json();
       }).then((res) => {
           if(addError){
-              setMessage(res.error || "Something unexpected happen. Please try again later")
+            setMessage(res.error || "Something unexpected happen. Please try again later")
           } else {
-              setMessage("Shipment added successfully");
-              setAdd(true);
-              setAdded(true);
+              setMessage(null);
+              setAdded();
           }
           setAddError(false);
       });
@@ -80,7 +78,9 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
       }}
       overlayStyle={{ background: "rgba(0,0,0,0.5)" }}
     >
+
       {close => (
+
         <div className="relative bg-black max-w-[90vw] md:max-w-[400px] w-full rounded-lg p-8 mx-auto flex flex-col items-center shadow-lg">
           <button
             className="absolute top-0 right-1 text-gray-600 text-4xl font-bold hover:text-blue-900 transition"
@@ -203,7 +203,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
               Add Shipment
             </button>
           </form>
-          {added && <div>{message}</div>}
+          {addError && <div>{message}</div>}
         </div>
       )}
     </Popup>
