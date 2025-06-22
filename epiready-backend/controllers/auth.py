@@ -19,17 +19,31 @@ def signup():
 
     Registers a new user.
 
+    Request Body:
+    {
+        "email": "user@example.com",
+        "password": "password123",
+        "role": "manufacturer"  // Optional: manufacturer, transporter, transporter_manager
+    }
+
     Possible Error Responses:
     - 400 Bad Request: "Please type both email and password as they are both required."
+    - 400 Bad Request: "Invalid role. Must be one of: manufacturer, transporter, transporter_manager"
     - 400 Bad Request: "This email address is already registered as a user."
     """
 
     data = request.get_json(force=True)
     email, password = data.get("email"), data.get("password")
+    role = data.get("role", "manufacturer")
+    
     if not email or not password:
         return jsonify({"error": "Please type both email and password as they are both required."}), 400
     
-    if not create_user(email, password):
+    valid_roles = ['manufacturer', 'transporter', 'transporter_manager']
+    if role not in valid_roles:
+        return jsonify({"error": f"Invalid role. Must be one of: {', '.join(valid_roles)}"}), 400
+    
+    if not create_user(email, password, role):
         return jsonify({"error": "This email address is already registered as a user."}), 400
     
     return jsonify({"message": "User registered successfully!"}), 200
