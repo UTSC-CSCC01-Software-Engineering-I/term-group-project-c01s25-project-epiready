@@ -6,11 +6,13 @@ class Shipment(db.Model):
     __tablename__ = 'shipments'
 
     id = db.Column(db.String(50), primary_key=True)  # Shipment ID
+    name = db.Column(db.String(100), unique=True, nullable=False)  # Unique shipment name
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link to User
     product_type = db.Column(db.String(100), nullable=False)
     origin = db.Column(db.String(100), nullable=False)
     destination = db.Column(db.String(100), nullable=False)
-    required_temp_range = db.Column(db.String(50), nullable=False) # in celsius and is a range(example: "2 to 8")
+    min_temp = db.Column(db.Float, nullable=False)  # Minimum temperature in Celsius
+    max_temp = db.Column(db.Float, nullable=False)  # Maximum temperature in Celsius
     humidity_sensitivity = db.Column(db.String(20), nullable=False) # low, medium, high
     aqi_sensitivity = db.Column(db.String(20), nullable=False) # low, medium, high
     transit_time_hrs = db.Column(db.Integer, nullable=False)
@@ -30,11 +32,13 @@ class Shipment(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'name': self.name,
             'user_id': self.user_id,
             'product_type': self.product_type,
             'origin': self.origin,
             'destination': self.destination,
-            'required_temp_range': self.required_temp_range,
+            'min_temp': self.min_temp,
+            'max_temp': self.max_temp,
             'humidity_sensitivity': self.humidity_sensitivity,
             'aqi_sensitivity': self.aqi_sensitivity,
             'transit_time_hrs': self.transit_time_hrs,
