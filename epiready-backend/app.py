@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from config.database import init_db
 import os
 
-from models import user, shipment, temperature, alert, weather
+from models import user, shipment, temperature, alert, weather, shipment_action
 
 load_dotenv()
 
