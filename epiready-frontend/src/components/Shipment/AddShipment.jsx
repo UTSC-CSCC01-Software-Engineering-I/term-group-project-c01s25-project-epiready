@@ -5,9 +5,8 @@ import "reactjs-popup/dist/index.css";
 export default function AddShipmentPopup({ trigger, setAdded }) {
   const [message, setMessage] = useState(null);
   const [addError, setAddError] = useState(false);
-  const [added, setAdd] = useState(false);
 
-  const handleAdd = (e) => {
+  const handleAdd = (e, close) => {
       e.preventDefault();
   
       const form = e.target;
@@ -53,11 +52,11 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
           return res.json();
       }).then((res) => {
           if(addError){
-              setMessage(res.error || "Something unexpected happen. Please try again later")
+            setMessage(res.error || "Something unexpected happen. Please try again later")
           } else {
-              setMessage("Shipment added successfully");
-              setAdd(true);
-              setAdded(true);
+              setMessage(null);
+              setAdded();
+              close();
           }
           setAddError(false);
       });
@@ -80,7 +79,9 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
       }}
       overlayStyle={{ background: "rgba(0,0,0,0.5)" }}
     >
+
       {close => (
+
         <div className="relative bg-black max-w-[90vw] md:max-w-[400px] w-full rounded-lg p-8 mx-auto flex flex-col items-center shadow-lg">
           <button
             className="absolute top-0 right-1 text-gray-600 text-4xl font-bold hover:text-blue-900 transition"
@@ -90,7 +91,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
             &times;
           </button>
           <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">Create Shipment</h2>
-          <form onSubmit={handleAdd} className="w-full flex flex-col gap-4">
+          <form onSubmit={e => handleAdd(e, close)} className="w-full flex flex-col gap-4">
             <input
               type="text"
               placeholder="Product Name"
@@ -120,7 +121,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
                     type="number"
                     name="hours"
                     id="minTemp"
-                    placeholder="Min"
+                    placeholder="Hours"
                     className="border border-gray-300 rounded px-2 py-1 w-20"
                     min="0"
                     max="150"
@@ -130,7 +131,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
                     type="number"
                     name="mins"
                     id="maxTemp"
-                    placeholder="Max"
+                    placeholder="Mins"
                     className="border border-gray-300 rounded px-2 py-1 w-20"
                     min="0"
                     max="60"
@@ -203,7 +204,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
               Add Shipment
             </button>
           </form>
-          {added && <div>{message}</div>}
+          {addError && <div>{message}</div>}
         </div>
       )}
     </Popup>

@@ -8,7 +8,6 @@ export default function ShowShipments() {
     const [shipments, setShipments] = useState([]);
     const [shipmentComponents, setShipmentComponents] = useState([]);
     const [isLoading, setIsLoading] = useState(null);
-    const [added, setAdded] = useState(null);
     const {loggedIn, setLoggedIn} = useGlobal();
 
     const addShipment = (
@@ -18,6 +17,24 @@ export default function ShowShipments() {
             </div>
         </div>
     )
+
+    const setAdded = () => {
+        if(loggedIn){
+            fetch("http://127.0.0.1:5000/api/shipments/", {
+            method: "GET",
+            headers: {
+                'Authorization': sessionStorage.getItem("token"),
+                'Content-Type': 'application/json'
+            }
+            })
+            .then((res) => {
+                console.log(res);
+                return res.json();})
+            .then(res => {
+                console.log(res);
+                setShipments(res);
+        });}
+    }
 
     useEffect(() => {
         if(loggedIn){
@@ -35,7 +52,7 @@ export default function ShowShipments() {
                 console.log(res);
                 setShipments(res);
             });}
-    }, [loggedIn, added]);
+    }, [loggedIn]);
 
     useEffect(() => {
         const components = shipments.map((shipment) => (
