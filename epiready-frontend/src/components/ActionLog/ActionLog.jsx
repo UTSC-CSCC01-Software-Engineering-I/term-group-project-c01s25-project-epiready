@@ -2,7 +2,7 @@ import React, { useState, useRef, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import classes from "./ActionLog.module.css";
 
-export default function ActionLog({ type, onDestroy, id, msg }) {
+export default function ActionLog({ type, onDestroy, id, msg, isHome = false }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [cardHeight, setCardHeight] = useState("auto");
   let msgColor = classes.Notice;
@@ -17,6 +17,10 @@ export default function ActionLog({ type, onDestroy, id, msg }) {
   } else if (type === 3) {
     msgColor = classes.Severe;
     statusMessage = "Severe";
+  }
+
+  if (isHome) {
+    msgColor = classes.Home;
   }
 
   const frontRef = useRef(null);

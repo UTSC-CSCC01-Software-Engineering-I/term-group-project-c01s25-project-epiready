@@ -8,7 +8,7 @@ export default function LoginPopup({ trigger }) {
     const [message, setMessage] = useState(null);
     const {loggedIn, setLoggedIn} = useGlobal();
 
-  const handleLogin = (e) => {
+  const handleLogin = (e, close) => {
     e.preventDefault();
 
     const form = e.target;
@@ -38,6 +38,7 @@ export default function LoginPopup({ trigger }) {
             sessionStorage.setItem("token", "Bearer " + res.token);
             setLoggedIn(true);
             setMessage("Logged in successfully");
+            close();
         }
     });
   }
@@ -68,7 +69,7 @@ export default function LoginPopup({ trigger }) {
             &times;
           </button>
           <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">Welcome Back</h2>
-          <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
+          <form onSubmit={e => handleLogin(e, close)} className="w-full flex flex-col gap-4">
             <input
               type="email"
               name="email"
@@ -88,7 +89,7 @@ export default function LoginPopup({ trigger }) {
               Log In
             </button>
           </form>
-          {loggedIn && <div>{message}</div>}
+          {loginError && <div>{message}</div>}
         </div>
       )}
     </Popup>
