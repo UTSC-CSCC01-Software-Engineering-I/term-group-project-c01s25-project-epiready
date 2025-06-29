@@ -8,8 +8,8 @@ from routes import all_blueprints
 from dotenv import load_dotenv
 from config.database import init_db
 import os
-from models import user, shipment, temperature, alert, weather
 from socket_events import register_socketio_events
+from models import user, shipment, temperature, alert, weather, shipment_action
 
 load_dotenv()
 

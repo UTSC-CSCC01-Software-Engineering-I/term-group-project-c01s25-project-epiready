@@ -8,21 +8,31 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='manufacturer')  # manufacturer, transporter, transporter_manager
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     shipments = db.relationship('Shipment', backref='user', lazy=True)
 
     def to_dict(self):
-        return {"id": self.id, "email": self.email, "created_at": self.created_at.isoformat()}
+        return {
+            "id": self.id, 
+            "email": self.email, 
+            "role": self.role,
+            "created_at": self.created_at.isoformat()
+        }
 
-def create_user(email: str, raw_password: str) -> User:
+def create_user(email: str, raw_password: str, role: str = 'manufacturer') -> User:
     existing_user = User.query.filter_by(email=email).first()
     
     if existing_user:
         return None
     
+    valid_roles = ['manufacturer', 'transporter', 'transporter_manager']
+    if role not in valid_roles:
+        role = 'manufacturer'
+    
     pw_hash = bcrypt.hashpw(raw_password.encode(), bcrypt.gensalt()).decode()
-    user = User(email=email, password_hash=pw_hash)
+    user = User(email=email, password_hash=pw_hash, role=role)
     db.session.add(user)
     db.session.commit()
     return user
