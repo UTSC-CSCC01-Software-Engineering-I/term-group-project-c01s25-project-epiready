@@ -1,10 +1,7 @@
-import eventlet
-eventlet.monkey_patch()
-
 import random
 from datetime import datetime, timezone
 from models.shipment import Shipment
-
+import eventlet
 
 def parse_temp_range(temp_range):
     """Parses a string like '2 to 8' into (2.0, 8.0)."""
@@ -24,13 +21,18 @@ def humidity_threshold(level):
 
 def start_temperature_monitor(socketio, app):
     with app.app_context():
+        print("Starting")
         while True:
             internal_temp = round(random.uniform(2, 10), 2)
             external_temp = round(random.uniform(0, 35), 2)
             humidity = round(random.uniform(10, 85), 2)
             timestamp = datetime.now(timezone.utc).isoformat()
+            
+            print("query")
 
             shipments = Shipment.query.filter_by(status='active').all()
+            
+            print(shipments)
 
             for shipment in shipments:
                 lat, lon = (None, None)
@@ -40,7 +42,8 @@ def start_temperature_monitor(socketio, app):
                     except:
                         pass
 
-                low_temp, high_temp = parse_temp_range(shipment.required_temp_range)
+                low_temp = shipment.min_temp
+                high_temp = shipment.max_temp
                 humidity_limit = humidity_threshold(shipment.humidity_sensitivity)
 
                 breach = False
