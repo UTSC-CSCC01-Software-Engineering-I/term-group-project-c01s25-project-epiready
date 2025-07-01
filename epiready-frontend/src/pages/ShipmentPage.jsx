@@ -2,32 +2,20 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect, use } from 'react';
 import Navbar from '../components/Navbar';
 import MapComponent from '../components/maps/MapComponent';
+import { useGlobal } from '../LoggedIn';
 
 export default function ShipmentPage() {
-  const { id } = useParams();
+  const { name } = useParams();
   const [tab, setTab] = useState('info');
   const [shipmentDetails, setShipmentDetails] = useState(null);
-  const [position, setPosition] = useState({lat: 43.6800, lng: -79.4000});
+  const [position, setPosition] = useState({ lat: 43.6800, lng: -79.4000 });
+  const [origin, setOrigin] = useState({ lat: 43.6532, lng: -79.3832 });
+  const [destination, setDestination] = useState({ lat: 43.7001, lng: -79.4163 });
+  const { loggedIn } = useGlobal();
 
-
-  const origin = { lat: 43.6532, lng: -79.3832 }; // Toronto, ON (Origin)
-  const destination = { lat: 43.7001, lng: -79.4163 }; // North York, ON (Destination)
-  const personLocation = { lat: 43.6800, lng: -79.4000 }
   const googleMapsApiKey = import.meta.env.VITE_MAPS_KEY;
 
 
-  // const onLoad = (map) => {
-  //   mapRef.current = map;
-  //   // Add marker manually to avoid re-rendering map
-  //   const marker = new window.google.maps.Marker({
-  //     position,
-  //     map,
-  //     title: 'My Marker'
-  //   });
-  //   markerRef.current = marker;
-  // };
-
-  // Update position every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setPosition((prev) => ({
@@ -38,38 +26,94 @@ export default function ShipmentPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // const fetchShipmentDetails = () => {
-  //   // Fetch shipment details using the id
-  //   fetch(`http://localhost:3000/api/shipments/${id}`)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       // Handle the shipment details
-  //       setShipmentDetails(data);
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error fetching shipment details:', error);
-  //     });
-  // };
 
-//   useEffect(() => {
-//     fetchShipmentDetails();
-//   }, [id]);
+  const fetchShipmentDetails = () => {
+    fetch(`http://localhost:3000/api/shipments/${name}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': sessionStorage.getItem('token'),
+        'Content-Type': 'application/json'
+      }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setShipmentDetails(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching shipment details:', error);
+      });
+  };
 
+
+  useEffect(() => {
+    fetchShipmentDetails();
+  }, [name]);
+
+  
   const shipmentInfo = (info) => (
-    <div className='w-full'>
-      <h1 className="text-4xl font-bold mb-2 underline">
+    <div className="w-full bg-neutral-900 rounded-xl p-6 shadow-lg">
+      <h1 className="text-4xl font-bold mb-6 underline text-center text-[#bfc9d1] tracking-wide">
         {info.name}
       </h1>
-      <div className="flex flex-wrap gap-4">
-        <div className="basis-[45%] text-white"><span>Location:</span> {info.location}</div>
-        <div className="basis-[45%] text-white">Status: {info.status}</div>
-        <div className="basis-[45%] text-white">Item 3</div>
-        <div className="basis-[45%] text-white">Item 4</div>
+      <div className="flex flex-wrap gap-y-8 gap-x-10 justify-between mb-8">
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Location:</span> {info.location}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Temperature:</span> {info.temperature}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Transit Status:</span> {info.transit_status}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Status:</span> {info.status}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Origin:</span> {info.origin || "-"}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Destination:</span> {info.destination || "-"}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Product Type:</span> {info.product_type || "-"}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Mode of Transport:</span> {info.mode_of_transport || "-"}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Minimum Temperature:</span> {info.min_temp || "-"}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Maximum Temperature:</span> {info.max_temp || "-"}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Humidity Sensitivity:</span> {info.humidity_sensitivity || "-"}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>AQI Sensitivity:</span> {info.aqi_sensitivity || "-"}
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row justify-evenly items-center mt-6 w-full max-w-2xl mx-auto">
+        <button
+          className="flex-1 px-6 py-3 rounded-lg font-semibold text-white mx-2 my-1 sm:my-0 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-[#6B805E] hover:bg-[#4e6147] focus:bg-[#4e6147]"
+        >
+          Set Transit Status
+        </button>
+        <button
+          className="flex-1 px-6 py-3 rounded-lg font-semibold text-white mx-2 my-1 sm:my-0 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-[#6B805E] hover:bg-[#4e6147] focus:bg-[#4e6147]"
+        >
+          Add Action
+        </button>
+        <button
+          className="flex-1 px-6 py-3 rounded-lg font-semibold text-white mx-2 my-1 sm:my-0 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-[#6B805E] hover:bg-[#4e6147] focus:bg-[#4e6147]"
+        >
+          Set Shipment Status
+        </button>
       </div>
     </div>
   );
 
-  return (
+  const content = (
     <div className="bg-[#1D1D1D] min-h-screen flex flex-col items-center">
       <Navbar currentPage="/" />
       <div className="w-screen flex justify-center items-center mt-0 min-h-16 h-16 border-b-1 border-neutral-600 drop-shadow-xl drop-shadow-neutral-700/40 overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-600">
@@ -134,7 +178,7 @@ export default function ShipmentPage() {
           shipmentInfo({
             name: shipmentDetails ? shipmentDetails.product_type : 'COVID-19 Vaccines',
             location: shipmentDetails ? shipmentDetails.destination : '123 Main Street, Anytown, CA',
-            status: shipmentDetails ? shipmentDetails.status || 'On track' : 'On track', 
+            status: shipmentDetails ? shipmentDetails.status || 'On track' : 'No Issues', 
           })
         )}
         {tab === 'location' && (
@@ -152,123 +196,20 @@ export default function ShipmentPage() {
       </div>
     </div>
   );
+
+  if (!loggedIn) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-white text-xl text-center bg-neutral-800 rounded-lg px-8 py-6 shadow-lg">
+          Please log in to view this page.
+        </div>
+        <div className="mt-4">
+          <a href="/" className="text-blue-500 hover:underline">Home</a>
+        </div>
+      </div>
+    );
+  } else {
+    return content;
+  }
+
 }
-
-
-
-
-
-
-  // const tabs = [
-  //   { id: 'info', label: 'Info' },
-  //   { id: 'location', label: 'Location' },
-  //   { id: 'history', label: 'History' },
-  //   { id: 'graphs', label: 'Graphs' }
-  // ];
-
-  // const fetchShipmentDetails = () => {
-  //   // Fetch shipment details using the id
-  //   fetch(`http://localhost:5000/api/shipments/${id}`)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setShipmentDetails(data);
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error fetching shipment details:', error);
-  //     });
-  // };
-
-  // useEffect(() => {
-  //   fetchShipmentDetails();
-  // }, [id]);
-
-  // const renderTabContent = () => {
-  //   if (!shipmentDetails) {
-  //     return <div className="text-white">Loading...</div>;
-  //   }
-
-  //   switch (tab) {
-  //     case 'info':
-  //       return (
-  //         <div className="text-white space-y-8">
-  //           <div>
-  //             <h1 className="text-4xl font-bold mb-2 underline">
-  //               {shipmentDetails.product_type || 'COVID-19 Vaccines'}
-  //             </h1>
-  //           </div>
-
-  //           <div>
-  //             <h2 className="text-xl font-semibold mb-2 underline">Location</h2>
-  //             <p className="text-lg">
-  //               {shipmentDetails.destination || '123 Main Street, Anytown, CA'}
-  //             </p>
-  //           </div>
-
-  //           <div>
-  //             <h2 className="text-xl font-semibold mb-2 underline">Description</h2>
-  //             <p className="text-lg">
-  //               The shipment has {shipmentDetails.aqi_sensitivity || 'low'} aqi sensitivity 
-  //               and {shipmentDetails.humidity_sensitivity || 'medium'} humidity sensitivity and is being carried
-  //               on a {shipmentDetails.mode_of_transport || 'truck'}
-  //             </p>
-  //           </div>
-
-  //           <div>
-  //             <h2 className="text-xl font-semibold mb-2 underline">Status</h2>
-  //             <p className="text-lg text-green-400">
-  //               {shipmentDetails.status || 'On track'}
-  //             </p>
-  //           </div>
-
-  //           <div>
-  //             <h2 className="text-xl font-semibold mb-2 underline">Temperature</h2>
-  //             <p className="text-lg">
-  //               {shipmentDetails.required_temp_range || '2-8 Degrees Celsius'}
-  //             </p>
-  //           </div>
-  //         </div>
-  //       );
-  //     case 'location':
-  //       return <div className="text-white">Location content here</div>;
-  //     case 'history':
-  //       return <div className="text-white">History content here</div>;
-  //     case 'graphs':
-  //       return <div className="text-white">Graphs content here</div>;
-  //     default:
-  //       return null;
-  //   }
-  // };
-
-  // return (
-  //   <div className="bg-[#1D1D1D] min-h-screen flex flex-col">
-  //     <Navbar currentPage="/" />
-      
-  //     {/* Tab Navigation */}
-  //     <div className="w-full flex justify-center border-b border-neutral-600">
-  //       <div className="w-9/10 sm:w-4/5 h-16 flex items-center">
-  //         <div className="flex gap-8">
-  //           {tabs.map((tabItem) => (
-  //             <button
-  //               key={tabItem.id}
-  //               onClick={() => setTab(tabItem.id)}
-  //               className={`px-4 py-2 text-lg font-medium transition-colors ${
-  //                 tab === tabItem.id
-  //                   ? 'text-white border-b-2 border-green-400'
-  //                   : 'text-gray-400 hover:text-white'
-  //               }`}
-  //             >
-  //               {tabItem.label}
-  //             </button>
-  //           ))}
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //     {/* Main Content */}
-  //     <div className="flex-1 w-full flex justify-center">
-  //       <div className="w-9/10 sm:w-4/5 py-8">
-  //         {renderTabContent()}
-  //       </div>
-  //     </div>
-  //   </div>
-  // );

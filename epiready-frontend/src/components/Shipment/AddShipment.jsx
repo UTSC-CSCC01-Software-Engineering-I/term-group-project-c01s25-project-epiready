@@ -10,7 +10,8 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
       e.preventDefault();
   
       const form = e.target;
-      if(!form.mode.value || !form.product.value || !form.hours.value || !form.mins.value || !form.aqi.value
+      if(!form.mode.value || !form.product_name.value || !form.product_type.value ||
+        !form.hours.value || !form.aqi.value
         || !form.origin.value || !form.humidity.value
       ) {
         setAddError(true);
@@ -31,37 +32,48 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
           {
               method: "POST",
               body: JSON.stringify({
-                product_type: product,
+                name: name,
+                product_type: product_type,
                 destination: destination,
-                required_temp_range: range,
+                min_temp: minTemp,
+                max_temp: maxTemp,
                 humidity_sensitivity: humidity,
                 aqi_sensitivity: aqi,
                 transit_time_hrs: time,
-                risk_factor: "low",
                 mode_of_transport: mode,
+                origin: origin,
                 status: "On Track",
-                origin: origin
+                risk_factor: "Medium"
               }),
               headers: {
                 "Authorization": sessionStorage.getItem("token"),
                 "Content-Type": "application/json"
               }
           }
-      ).then((res) => {
-          if(!res.ok){
+      )
+      .then(async (res) => {
+          console.log("Add Shipment response status: " + res.status);
+          let data = {};
+          try {
+            data = await res.json();
+          } catch (e) {
+            // Not JSON
+            setMessage(`Error ${res.status}: Something unexpected happened. Please try again later`);
+            setAddError(true);
+          }
+          if (!res.ok || data.error) {
               setAddError(true);
+              setMessage(data.error || `Error ${res.status}: Something unexpected happened. Please try again later`);
+              throw new Error(data.error || `Error ${res.status}: Something unexpected happened. Please try again later`);
           }
-          return res.json();
-      }).then((res) => {
-          if(addError){
-            setMessage(res.error || "Something unexpected happen. Please try again later")
-          } else {
-              setMessage(null);
-              setAdded();
-              close();
-          }
+          return data;
+      })
+      .then((res) => {
+          setMessage(null);
+          setAdded();
+          close();
           setAddError(false);
-      });
+      })
   }
 
 
@@ -97,7 +109,14 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
             <input
               type="text"
               placeholder="Product Name"
-              name="product"
+              name="product_name"
+              className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Product Type"
+              name="product_type"
               className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />

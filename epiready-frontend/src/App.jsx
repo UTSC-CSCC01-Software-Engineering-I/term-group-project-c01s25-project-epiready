@@ -33,7 +33,7 @@ export default function App() {
         <Route path="/shipments" element={<Shipments />} />
         <Route path="/monitor" element={<Monitor />} />
         <Route path="/alerts" element={<Alerts />} />
-        <Route path="/shipments/:id" element={<ShipmentPage />} />
+        <Route path="/shipments/:name" element={<ShipmentPage />} />
         <Route path="/map" element={
           <MapComponent 
             origin={origin} 
