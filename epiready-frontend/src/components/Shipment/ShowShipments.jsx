@@ -20,7 +20,7 @@ export default function ShowShipments() {
 
     const setAdded = () => {
         if(loggedIn){
-            fetch("http://127.0.0.1:5000/api/shipments/", {
+            fetch("http://127.0.0.1:5000/api/shipments", {
             method: "GET",
             headers: {
                 'Authorization': sessionStorage.getItem("token"),
@@ -38,7 +38,7 @@ export default function ShowShipments() {
 
     useEffect(() => {
         if(loggedIn){
-            fetch("http://127.0.0.1:5000/api/shipments/", {
+            fetch("http://127.0.0.1:5000/api/shipments", {
             method: "GET",
             headers: {
                 'Authorization': sessionStorage.getItem("token"),
