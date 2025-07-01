@@ -16,16 +16,18 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
         setAddError(true);
         setMessage("You must fill all fields in order to submit the shipment")
       }
+      const name = form.product_name.value;
       const mode = form.mode.value;
-      const product = form.product.value;
-      const range = (form.minTemp.value || "") + " - " + (form.maxTemp.value || "");
+      const product_type = form.product_type.value;
+      const minTemp = form.minTemp.value;
+      const maxTemp = form.maxTemp.value;
       const aqi = form.aqi.value;
       const humidity = form.humidity.value;
       const origin = form.origin.value;
       const destination = form.destination.value;
       const time = form.hours.value;
   
-      fetch("http://127.0.0.1:5000/api/shipments/",
+      fetch("http://127.0.0.1:5000/api/shipments",
           {
               method: "POST",
               body: JSON.stringify({
@@ -114,30 +116,19 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
               required
             />
             <div className="flex items-center gap-4">
-                <label htmlFor="minTemp" className="text-gray-400 font-medium">
+                <label htmlFor="time" className="text-gray-400 font-medium">
                     Time:
                 </label>
                 <input
                     type="number"
                     name="hours"
-                    id="minTemp"
+                    id="time"
                     placeholder="Hours"
                     className="border border-gray-300 rounded px-2 py-1 w-20"
                     min="0"
                     max="150"
                 />
                 <span className="text-gray-500">Hours</span>
-                <input
-                    type="number"
-                    name="mins"
-                    id="maxTemp"
-                    placeholder="Mins"
-                    className="border border-gray-300 rounded px-2 py-1 w-20"
-                    min="0"
-                    max="60"
-                    required
-                />
-                <span className="text-gray-500">Minutes</span>
             </div>
             <select
                 name="aqi"

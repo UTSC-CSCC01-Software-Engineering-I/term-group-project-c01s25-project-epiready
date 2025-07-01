@@ -11,7 +11,7 @@ import Monitor from "./pages/Monitor";
 import Alerts from "./pages/Alerts";
 import { GlobalProvider } from "./LoggedIn";
 import ShipmentPage from "./pages/ShipmentPage";
-import MapComponent from "./components/maps/Maps";
+import MapComponent from "./components/maps/MapComponent";
 
 
 export default function App() {
@@ -19,7 +19,7 @@ export default function App() {
   const origin = { lat: 43.6532, lng: -79.3832 }; // Toronto, ON (Origin)
   const destination = { lat: 43.7001, lng: -79.4163 }; // North York, ON (Destination)
   const personLocation = { lat: 43.6800, lng: -79.4000 }
-  const googleMapsApiKey = import.meta.env.REACT_APP_MAPS_KEY;
+  const googleMapsApiKey = import.meta.env.VITE_MAPS_KEY;
 
   return (
     <GlobalProvider>
