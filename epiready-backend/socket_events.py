@@ -6,7 +6,7 @@ def register_socketio_events(socketio, app):
     
     @socketio.on('connect')
     def handle_connect(auth):
-        token = auth.get('token') if auth else None
+        token = auth.get('token').split(" ")[1] if auth else None
 
         if not token:
             print("No token provided on socket connection.")

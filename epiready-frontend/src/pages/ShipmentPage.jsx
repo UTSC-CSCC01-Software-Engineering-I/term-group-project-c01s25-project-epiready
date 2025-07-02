@@ -3,15 +3,19 @@ import { useState, useEffect, use } from 'react';
 import Navbar from '../components/Navbar';
 import MapComponent from '../components/maps/MapComponent';
 import { useGlobal } from '../LoggedIn';
+import {useSocket} from '../Socket';
+
 
 export default function ShipmentPage() {
   const { name } = useParams();
   const [tab, setTab] = useState('info');
   const [shipmentDetails, setShipmentDetails] = useState(null);
+  const [liveData, setLiveData] = useState(null);
   const [position, setPosition] = useState({ lat: 43.6800, lng: -79.4000 });
   const [origin, setOrigin] = useState({ lat: 43.6532, lng: -79.3832 });
   const [destination, setDestination] = useState({ lat: 43.7001, lng: -79.4163 });
   const { loggedIn } = useGlobal();
+  const socket = useSocket();
 
   const googleMapsApiKey = import.meta.env.VITE_MAPS_KEY;
 
@@ -26,9 +30,21 @@ export default function ShipmentPage() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    console.log("Socket initialized:", socket);
+    if (!socket) return;
+    socket.on("temperature_alert", (data) => {
+      console.log("Temperature alert received:", data);
+      setLiveData(data);
+    });
+    return () => {
+      socket.off("temperature_alert");
+    };
+  }, [socket]);
+
 
   const fetchShipmentDetails = () => {
-    fetch(`http://localhost:3000/api/shipments/${name}`, {
+    fetch(`http://localhost:5000/api/shipments/${name}`, {
       method: 'GET',
       headers: {
         'Authorization': sessionStorage.getItem('token'),
@@ -57,16 +73,22 @@ export default function ShipmentPage() {
       </h1>
       <div className="flex flex-wrap gap-y-8 gap-x-10 justify-between mb-8">
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
-          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Location:</span> {info.location}
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Location:</span> In ontario, Canada
         </div>
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
-          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Temperature:</span> {info.temperature}
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Transit Status:</span> {info.current_location}
         </div>
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
-          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Transit Status:</span> {info.transit_status}
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Risk:</span> {info.risk_factor}
         </div>
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
-          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Status:</span> {info.status}
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Humidity:</span> {liveData?.humidity}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Internal Temperature:</span> {liveData?.internal_temperature}
+        </div>
+        <div className="basis-[45%] text-[#d1d5db] text-2xl">
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>External Temperature:</span> {liveData?.external_temperature}
         </div>
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
           <span className="font-semibold" style={{ color: "#5e7c4e" }}>Origin:</span> {info.origin || "-"}
@@ -174,12 +196,8 @@ export default function ShipmentPage() {
       </div>
 
       <div className='flex-1 flex m-8 w-9/10 sm:w-4/5'>
-        {tab === 'info' && (
-          shipmentInfo({
-            name: shipmentDetails ? shipmentDetails.product_type : 'COVID-19 Vaccines',
-            location: shipmentDetails ? shipmentDetails.destination : '123 Main Street, Anytown, CA',
-            status: shipmentDetails ? shipmentDetails.status || 'On track' : 'No Issues', 
-          })
+        {tab === 'info' && shipmentDetails && (
+          shipmentInfo(shipmentDetails)
         )}
         {tab === 'location' && (
           <div className="w-full flex justify-center items-center">

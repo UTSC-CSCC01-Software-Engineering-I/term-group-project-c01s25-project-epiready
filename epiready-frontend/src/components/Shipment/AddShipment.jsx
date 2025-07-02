@@ -42,8 +42,9 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
                 transit_time_hrs: time,
                 mode_of_transport: mode,
                 origin: origin,
-                status: "On Track",
-                risk_factor: "Medium"
+                status: "active",
+                risk_factor: "Low",
+                current_location: "Waiting for loading"
               }),
               headers: {
                 "Authorization": sessionStorage.getItem("token"),

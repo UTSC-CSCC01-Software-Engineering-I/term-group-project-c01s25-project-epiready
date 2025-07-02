@@ -74,6 +74,6 @@ def start_temperature_monitor(socketio, app):
                 }
                 socketio.emit('temperature_alert', data, room=str(shipment.user_id))
                 
-                print(f"Event data sent to User with ID {shipment.user_id}: ", data)
+                # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
 
             eventlet.sleep(10)
