@@ -119,7 +119,7 @@ def get_all_shipments(user_id):
         return jsonify({'error': str(e)}), 500
     
 @token_required
-def get_shipment_by_name(name):
+def get_shipment_by_name(user_id, name):
     """
     GET /shipments/<name>
 
@@ -131,23 +131,6 @@ def get_shipment_by_name(name):
     - 404 Not Found: "Shipment not found"
     - 401 Unauthorized: "Session token was invalid."
     """
-    
-    token = None
-    if 'Authorization' in request.headers:
-        auth_header = request.headers['Authorization']
-        if auth_header.startswith("Bearer "):
-            token = auth_header[7:]
-    
-    if not token:
-        return jsonify({'error': 'Token is missing'}), 401
-    
-    try:
-        data = jwt.decode(token, current_app.secret_key, algorithms=["HS256"])
-        user_id = data['user_id']
-    except jwt.ExpiredSignatureError:
-        return jsonify({'error': 'Token has expired'}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({'error': 'Invalid token'}), 401
     
     user = User.query.get(user_id)
     

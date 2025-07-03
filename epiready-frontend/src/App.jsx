@@ -12,6 +12,8 @@ import Alerts from "./pages/Alerts";
 import { GlobalProvider } from "./LoggedIn";
 import ShipmentPage from "./pages/ShipmentPage";
 import MapComponent from "./components/maps/MapComponent";
+import { Socket } from "socket.io-client";
+import { SocketProvider } from "./Socket";
 
 
 export default function App() {
@@ -23,6 +25,7 @@ export default function App() {
 
   return (
     <GlobalProvider>
+    <SocketProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -33,7 +36,7 @@ export default function App() {
         <Route path="/shipments" element={<Shipments />} />
         <Route path="/monitor" element={<Monitor />} />
         <Route path="/alerts" element={<Alerts />} />
-        <Route path="/shipments/:id" element={<ShipmentPage />} />
+        <Route path="/shipments/:name" element={<ShipmentPage />} />
         <Route path="/map" element={
           <MapComponent 
             origin={origin} 
@@ -45,6 +48,7 @@ export default function App() {
       </Routes>
     </BrowserRouter>
     <div id="popup-root" />
+    </SocketProvider>
     </GlobalProvider>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 
 // Define the map container style
@@ -9,7 +9,13 @@ const containerStyle = {
 };
 
 
+import { useJsApiLoader } from '@react-google-maps/api';
+
 function MapComponent({ origin, destination, personLocation, googleMapsApiKey }) {
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey,
+    id: 'google-map-script',
+  });
   const [map, setMap] = useState(null);
   const personMarkerRef = useRef(null);
 
@@ -69,60 +75,68 @@ function MapComponent({ origin, destination, personLocation, googleMapsApiKey })
     }
   }, [personLocation, map]);
 
-  // Fit bounds on initial load and whenever origin/destination change
+  // Fit bounds on initial load and whenever origin/destination change, but do not override user pan/zoom after initial fit
+  const hasFitBounds = useRef(false);
   useEffect(() => {
     if (!map) return;
-    if (origin && destination) {
+    if (!hasFitBounds.current && origin && destination) {
       const bounds = new window.google.maps.LatLngBounds();
       bounds.extend(origin);
       bounds.extend(destination);
       map.fitBounds(bounds);
-    } else if (origin) {
+      hasFitBounds.current = true;
+    } else if (!hasFitBounds.current && origin) {
       map.setCenter(origin);
       map.setZoom(13);
-    } else if (destination) {
+      hasFitBounds.current = true;
+    } else if (!hasFitBounds.current && destination) {
       map.setCenter(destination);
       map.setZoom(13);
+      hasFitBounds.current = true;
     }
-  }, [map]);
+  }, [map, origin, destination]);
 
+  // Reset fit bounds if origin/destination change
+  useEffect(() => {
+    hasFitBounds.current = false;
+  }, [origin, destination]);
+
+  if (!isLoaded) return null;
   return (
-    <LoadScript googleMapsApiKey={googleMapsApiKey}>
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        onLoad={onLoad}
-        onUnmount={onUnmount}
-      >
-        {origin && (
-          <Marker
-            position={origin}
-            icon={{
-                url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-                scaledSize: { width: 40, height: 40}
-            }}
-            label={{
-              text: 'Origin',
-              color: 'white',
-              fontWeight: 'bold',
-            }}
-          />
-        )}
-        {destination && (
-          <Marker
-            position={destination}
-            icon={{
-                url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                scaledSize: { width: 40, height: 40}
-            }}
-            label={{
-              text: 'Dest.',
-              color: 'white',
-              fontWeight: 'bold',
-            }}
-          />
-        )}
-      </GoogleMap>
-    </LoadScript>
+    <GoogleMap
+      mapContainerStyle={containerStyle}
+      onLoad={onLoad}
+      onUnmount={onUnmount}
+    >
+      {origin && (
+        <Marker
+          position={origin}
+          icon={{
+              url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+              scaledSize: { width: 40, height: 40}
+          }}
+          label={{
+            text: 'Origin',
+            color: 'white',
+            fontWeight: 'bold',
+          }}
+        />
+      )}
+      {destination && (
+        <Marker
+          position={destination}
+          icon={{
+              url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+              scaledSize: { width: 40, height: 40}
+          }}
+          label={{
+            text: 'Dest.',
+            color: 'white',
+            fontWeight: 'bold',
+          }}
+        />
+      )}
+    </GoogleMap>
   );
 }
 
