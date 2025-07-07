@@ -7,7 +7,7 @@ export default function SignupPopup({ trigger }) {
   const [signedUp, setSignedUp] = useState(false);
   const [signupError, setSignupError] = useState(false);
 
-  const handleSignup = (e) => {
+  const handleSignup = (e, close) => {
       e.preventDefault();
   
       const form = e.target;
@@ -20,21 +20,37 @@ export default function SignupPopup({ trigger }) {
               body: JSON.stringify({
                   email: email,
                   password: password
-              })
+              }),
+              headers: {
+                  "Content-Type": "application/json"
+              }
           }
-      ).then((res) => {
-          if(!res.ok){
+      )
+      .then(async (res) => {
+          let data = {};
+          try {
+            data = await res.json();
+          } catch (e) {}
+          if (!res.ok || data.error) {
               setSignupError(true);
+              setMessage(data.error || "Something unexpected happened. Please try again later");
+              // Clear fields on error
+              form.email.value = "";
+              form.password.value = "";
+              throw new Error(data.error || "Something unexpected happened. Please try again later");
           }
-          return res.json();
-      }).then((res) => {
-          if(signupError){
-              setMessage(res.error || "Something unexpected happen. Please try again later")
-          } else {
-              setSignedUp(true);
-              setMessage("Signed up successfully");
-          }
+          return data;
+      })
+      .then((res) => {
+          setSignedUp(true);
+          setMessage("Signed up successfully");
           setSignupError(false);
+          // Close modal on success
+          close();
+      })
+      .catch((error) => {
+          // Error already handled above, but log for debugging
+          console.error("Signup error:", error);
       });
   }
 
@@ -65,7 +81,7 @@ export default function SignupPopup({ trigger }) {
             &times;
           </button>
           <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">Sign Up</h2>
-          <form onSubmit={handleSignup} className="w-full flex flex-col gap-4">
+          <form onSubmit={e => handleSignup(e, close)} className="w-full flex flex-col gap-4">
             <input
               type="email"
               placeholder="Email"
@@ -85,7 +101,7 @@ export default function SignupPopup({ trigger }) {
               Sign Up
             </button>
           </form>
-          {signedUp && <div>{message}</div>}
+          {message && <div>{message}</div>}
         </div>
       )}
     </Popup>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import ShowLogs from "../components/ActionLog/ShowLogs";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   const [show, setShow] = useState(false);
@@ -26,10 +27,11 @@ export default function Home() {
       <p
         className={`text-white text-3xl font-semibold text-center transition-all duration-900 ease-out ${showAlerts ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        Alerts
+        Recent Alerts
       </p>
-      <div className={`h-80 mb-auto flex flex-col items-center overflow-x-hidden scrollbar scrollbar-thumb-gray-600 transition-all duration-900 ease-out ${showAlerts ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <ShowLogs />
+      <div className={`h-80 mb-auto flex flex-col items-center transition-all duration-900 ease-out ${showAlerts ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <ShowLogs maxAlerts={2} isHome={true}/>
+        <Link to="/alerts" className="text-neutral-400"> See all</Link>
       </div>
     </div>
   );

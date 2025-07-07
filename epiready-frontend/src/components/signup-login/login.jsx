@@ -4,11 +4,11 @@ import "reactjs-popup/dist/index.css";
 import {useGlobal} from "../../LoggedIn";
 
 export default function LoginPopup({ trigger }) {
-    const [loginError, setLoginError] = useState(null);
+    const [loginError, setLoginError] = useState(false);
     const [message, setMessage] = useState(null);
     const {loggedIn, setLoggedIn} = useGlobal();
 
-  const handleLogin = (e) => {
+  const handleLogin = (e, close) => {
     e.preventDefault();
 
     const form = e.target;
@@ -26,19 +26,28 @@ export default function LoginPopup({ trigger }) {
                 "Content-Type": "application/json"
             }
         }
-    ).then((res) => {
-        if(!res.ok){
-            setLoginError(true);
-        }
-        return res.json();
-    }).then((res) => {
-        if(loginError){
-            setMessage(res.error || "Something unexpected happen. Please try again later")
-        } else {
-            sessionStorage.setItem("token", "Bearer " + res.token);
-            setLoggedIn(true);
-            setMessage("Logged in successfully");
-        }
+    )
+    .then(async (res) => {
+      console.log("Login response status: " + res.status);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Something unexpected happened. Please try again later");
+      }
+      return data;
+    })
+    .then((res) => {
+      sessionStorage.setItem("token", "Bearer " + res.token);
+      setLoggedIn(true);
+      setMessage("Logged in successfully");
+      close();
+    })
+    .catch((error) => {
+      setLoginError(true);
+      let errorMsg = error.message || "An error occurred during login. Please try again.";
+      if( error.message.includes("Failed to fetch") || error.message.includes("NetworkError") ) {
+        errorMsg = "Network error. Please check your internet connection and try again.";
+      }
+      setMessage(errorMsg);
     });
   }
 
@@ -68,7 +77,7 @@ export default function LoginPopup({ trigger }) {
             &times;
           </button>
           <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">Welcome Back</h2>
-          <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
+          <form onSubmit={e => handleLogin(e, close)} className="w-full flex flex-col gap-4">
             <input
               type="email"
               name="email"
@@ -88,7 +97,7 @@ export default function LoginPopup({ trigger }) {
               Log In
             </button>
           </form>
-          {loggedIn && <div>{message}</div>}
+          {loginError && <div>{message}</div>}
         </div>
       )}
     </Popup>

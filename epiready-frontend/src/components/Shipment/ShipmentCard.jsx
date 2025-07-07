@@ -1,25 +1,27 @@
 import React, { useState, useRef, useEffect, use } from "react";
 import classes from "./ShipmentCard.module.css";
+import { useNavigate } from "react-router-dom";
 
 export default function ShipmentCard({ shipment }) {
     const [expanded, setExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);
     const [maxHeight, setMaxHeight] = useState("110px");
     const sectionsRef = useRef(null);
+    const navigate = useNavigate();
 
     let statusColor = classes.onTrack;
     let boxColor = classes.shipmentOnTrack;
-    let statusMsg = "On Track";
+    let statusMsg = "No issues";
 
-    if (shipment.status === "Warning") {
+    if (shipment.risk_factor === "Medium") {
         statusColor = classes.warning;
         statusMsg = "Warning";
         boxColor = classes.shipmentWarning;
-    } else if (shipment.statusCode === "Severe") {
+    } else if (shipment.risk_factor === "High") {
         statusColor = classes.severe;
         statusMsg = "Severe";
         boxColor = classes.shipmentSevere;
-    } else if (shipment.status === "Critical") {
+    } else if (shipment.risk_factor === "Very High") {
         statusColor = classes.critical;
         statusMsg = "Critical";
         boxColor = classes.shipmentCritical;
@@ -62,10 +64,11 @@ export default function ShipmentCard({ shipment }) {
                     transition: "max-height 0.4s cubic-bezier(0.4,0,0.2,1)",
                     overflow: "hidden"
                 }}
+                onClick={() => navigate(`/shipments/${shipment.name}`)}
             >
                 <div className={classes.shipmentName}>
-                    <div className={classes.title}>Product</div>
-                    <div className={classes.content}>{shipment.product_type}</div>
+                    <div className={classes.title}>Name</div>
+                    <div className={classes.content}>{shipment.name}</div>
                 </div>
                 <div className={classes.shipmentLocation}>
                     <div className={classes.title}>Destination</div>
