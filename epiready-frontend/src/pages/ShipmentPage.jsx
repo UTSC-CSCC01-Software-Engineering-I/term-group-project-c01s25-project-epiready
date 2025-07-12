@@ -3,7 +3,8 @@ import { useState, useEffect, use } from 'react';
 import Navbar from '../components/Navbar';
 import MapComponent from '../components/maps/MapComponent';
 import { useGlobal } from '../LoggedIn';
-import {useSocket} from '../Socket';
+import { useSocket } from '../Socket';
+import ActionModal from '../components/Shipment/ActionModal';
 
 
 export default function ShipmentPage() {
@@ -14,6 +15,9 @@ export default function ShipmentPage() {
   const [position, setPosition] = useState({ lat: 43.6800, lng: -79.4000 });
   const [origin, setOrigin] = useState({ lat: 43.6532, lng: -79.3832 });
   const [destination, setDestination] = useState({ lat: 43.7001, lng: -79.4163 });
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
   const { loggedIn } = useGlobal();
   const socket = useSocket();
 
@@ -54,11 +58,41 @@ export default function ShipmentPage() {
       .then((response) => response.json())
       .then((data) => {
         setShipmentDetails(data);
+        console.log("Shipment details fetched:", data);
       })
       .catch((error) => {
         console.error('Error fetching shipment details:', error);
       });
   };
+
+  const createActionLog = (action, cb) => {
+    setActionError("");
+    setActionLoading(true);
+    fetch(`http://localhost:5000/api/shipments/${shipmentDetails.id}/actions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': sessionStorage.getItem('token'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ action })
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to add action");
+        return response.json();
+      })
+      .then((data) => {
+        setShowActionModal(false);
+        setActionError("");
+        setActionLoading(false);
+        if (cb) cb();
+        // Optionally refresh logs or show a toast
+      })
+      .catch((error) => {
+        setActionError(error.message);
+        setActionLoading(false);
+      });
+  };
+
 
 
   useEffect(() => {
@@ -71,6 +105,13 @@ export default function ShipmentPage() {
       <h1 className="text-4xl font-bold mb-6 underline text-center text-[#bfc9d1] tracking-wide">
         {info.name}
       </h1>
+      <ActionModal
+        open={showActionModal}
+        onClose={() => { setShowActionModal(false); setActionError(""); }}
+        onSubmit={createActionLog}
+        loading={actionLoading}
+        error={actionError}
+      />
       <div className="flex flex-wrap gap-y-8 gap-x-10 justify-between mb-8">
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
           <span className="font-semibold" style={{ color: "#5e7c4e" }}>Location:</span> In ontario, Canada
@@ -123,6 +164,7 @@ export default function ShipmentPage() {
         </button>
         <button
           className="flex-1 px-6 py-3 rounded-lg font-semibold text-white mx-2 my-1 sm:my-0 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-[#6B805E] hover:bg-[#4e6147] focus:bg-[#4e6147]"
+          onClick={() => setShowActionModal(true)}
         >
           Add Action
         </button>

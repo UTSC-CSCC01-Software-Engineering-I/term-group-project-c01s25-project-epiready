@@ -120,6 +120,8 @@ def start_temperature_monitor(socketio, app):
                     
                     alert_message = " | ".join(alert_messages)
                     create_alert(shipment.id, breach_type.lower().replace(" ", "_"), severity, alert_message)
+                    socketio.emit('breach_alert', data, room=str(shipment.user_id))
+
 
                 data = {
                     'timestamp': timestamp,
