@@ -16,6 +16,22 @@ jobs:
   python-lint:
     name: python-lint
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
     defaults:
       run:
         working-directory: ./epiready-backend
@@ -36,7 +52,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest
           pip install -r requirements.txt
-
+      - name: Migrate Database
+        run: |
+          flask db migrate
+          flask db upgrade
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
