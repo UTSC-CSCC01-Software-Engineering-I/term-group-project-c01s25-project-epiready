@@ -13,7 +13,7 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
- 
+
 def test_signup_missing_fields(client):
     response = client.post('/auth/signup', json={})
     assert response.status_code == 400
