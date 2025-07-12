@@ -3,7 +3,7 @@ name: Run Frontend Server
 on:
   push:
     paths:
-      - './epiready-frontend/**'
+      - 'epiready-frontend/**'
 
 jobs:
   test-and-lint:

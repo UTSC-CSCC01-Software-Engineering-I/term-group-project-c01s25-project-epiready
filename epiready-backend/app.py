@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from config.database import init_db, db
 import os
 from flask_migrate import Migrate
- 
+
 load_dotenv()
 
 socketio = SocketIO(cors_allowed_origins=os.getenv("CORS_ORIGIN"))

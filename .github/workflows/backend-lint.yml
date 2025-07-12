@@ -7,10 +7,10 @@ on:
       - develop
       - main
     paths:
-      - './epiready-backend/**'
+      - 'epiready-backend/**'
   pull_request:
     paths:
-      - './epiready-backend/**'
+      - 'epiready-backend/**'
 
 jobs:
   python-lint:
