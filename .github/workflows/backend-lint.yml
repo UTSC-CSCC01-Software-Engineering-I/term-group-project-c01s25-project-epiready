@@ -31,7 +31,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
+      DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
     defaults:
       run:
         working-directory: ./epiready-backend
