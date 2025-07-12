@@ -18,7 +18,7 @@ def test_signup_missing_fields(client):
     response = client.post('/auth/signup', json={})
     assert response.status_code == 400
     assert b"required" in response.data
-
+ 
 def test_signup_invalid_role(client):
     response = client.post('/auth/signup', json={"email": "a@b.com", "password": "123", "role": "invalid"})
     assert response.status_code == 400
