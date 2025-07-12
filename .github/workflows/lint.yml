@@ -29,8 +29,8 @@ jobs:
       - name: Sleep 2 seconds
         run: sleep 2s
       - name: Start Frontend Server
-        run: npm run preview
+        run: npm run preview &
       - name: Sleep 2 seconds
         run: sleep 2s
       - name: Check frontend
-        run: curl --request GET http://localhost:5173/ --fail
+        run: curl --request GET http://localhost:4173/ --fail
