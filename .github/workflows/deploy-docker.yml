@@ -1,5 +1,8 @@
 name: Build and deploy to Docker Hub
 on:
+  push:
+    branches:
+      - feat/ci-cd
   workflow_dispatch:
 jobs:
   build:
