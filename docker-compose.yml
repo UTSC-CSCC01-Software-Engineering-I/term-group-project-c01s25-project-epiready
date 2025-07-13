@@ -14,7 +14,8 @@ services: # Start with this tag. This will contain all the containers you want t
     build: # Build the image from the Dockerfile
       context: ./epiready-frontend # Path to the Dockerfile
       dockerfile: Dockerfile  # Name of the Dockerfile
-    container_name: epiready-frontend
+    image: epiready-frontend:latest # Explicitly name the image
+    container_name: frontend
     environment:
       - VITE_MAPS_KEY=${VITE_MAPS_KEY}
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
@@ -33,7 +34,8 @@ services: # Start with this tag. This will contain all the containers you want t
     build:
       context: ./epiready-backend
       dockerfile: Dockerfile
-    container_name: epiready-backend
+    image: epiready-backend:latest # Explicitly name the image
+    container_name: backend
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
