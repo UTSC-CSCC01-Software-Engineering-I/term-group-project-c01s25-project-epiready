@@ -48,7 +48,7 @@ export default function ShipmentPage() {
 
 
   const fetchShipmentDetails = () => {
-    fetch(`http://localhost:5000/api/shipments/${name}`, {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${name}`, {
       method: 'GET',
       headers: {
         'Authorization': sessionStorage.getItem('token'),
@@ -68,7 +68,7 @@ export default function ShipmentPage() {
   const createActionLog = (action, cb) => {
     setActionError("");
     setActionLoading(true);
-    fetch(`http://localhost:5000/api/shipments/${shipmentDetails.id}/actions`, {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
       method: 'POST',
       headers: {
         'Authorization': sessionStorage.getItem('token'),

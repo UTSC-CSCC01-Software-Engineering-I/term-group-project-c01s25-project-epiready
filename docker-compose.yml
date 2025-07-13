@@ -1,0 +1,52 @@
+services: # Start with this tag. This will contain all the containers you want to run
+  postgres: # For each container, define the block name. Can be anything, but should match the name of the container
+    container_name: postgres # Name of the container
+    image: postgres:latest # If you want to use published Docker image, then use this tag to specify
+    restart: always # Restart the container if it stops
+    environment: # Environment variables to be passed to the container
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: epidb
+    ports: # Ports to be exposed to the host machine
+        - "5432:5432"
+  
+  frontend:
+    build: # Build the image from the Dockerfile
+      context: ./epiready-frontend # Path to the Dockerfile
+      dockerfile: Dockerfile  # Name of the Dockerfile
+    container_name: frontend
+    environment:
+      - VITE_MAPS_KEY=${VITE_MAPS_KEY}
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+    ports:
+      - '80:80' # Nginx runs on port 80 by default
+    restart: always
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+
+  backend:
+    build:
+      context: ./epiready-backend
+      dockerfile: Dockerfile
+    container_name: backend
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=epidb
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/epidb
+      - FRONTEND_ORIGINS=${FRONTEND_ORIGINS}
+      - SECRET_KEY=${SECRET_KEY}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+    ports:
+      - "5000:5000"
+    restart: always
+    depends_on:
+      - postgres
+

@@ -13,8 +13,8 @@ export default function SignupPopup({ trigger }) {
       const form = e.target;
       const email = form.email.value;
       const password = form.password.value;
-  
-      fetch("http://127.0.0.1:5000/api/auth/signup",
+
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
           {
               method: "POST",
               body: JSON.stringify({

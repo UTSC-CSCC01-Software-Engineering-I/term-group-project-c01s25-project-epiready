@@ -25,7 +25,7 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
     }, [logs]);
 
     const fetchLogs = () => {
-        fetch("http://localhost:5000/api/alerts", {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alerts`, {
             method: "GET",
             headers: {
                 "Authorization": sessionStorage.getItem("token"),
