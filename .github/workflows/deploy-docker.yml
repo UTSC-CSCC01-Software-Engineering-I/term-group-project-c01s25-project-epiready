@@ -20,7 +20,9 @@ jobs:
             FRONTEND_ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
             SECRET_KEY: ${{ secrets.SECRET_KEY }}
             CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
-        run: docker compose build
+        run: |
+          docker compose build
+          docker compose up
 
 
       - name: Log in to Docker Hub
@@ -31,8 +33,8 @@ jobs:
       
       - name: Push to Docker Hub
         run: |
-          docker tag frontend ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
-          docker tag backend ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
+          docker tag epiready-frontend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
+          docker tag epiready-backend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
           docker images
