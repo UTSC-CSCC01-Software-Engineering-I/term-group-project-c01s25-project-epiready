@@ -17,6 +17,5 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Run the application directly with Python's Flask development server
-# Note: This is not recommended for production use.
-CMD ["gunicorn", "-w", "4", "-k", "eventlet", "-b", "0.0.0.0:5000", "app:app"]
+# Run the application using Gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
