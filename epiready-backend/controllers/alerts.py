@@ -75,7 +75,7 @@ def start_temperature_monitor(socketio, app):
                 if low_temp is not None and high_temp is not None:
                     if not (low_temp <= internal_temp <= high_temp):
                         breach = True
-                        breach_type = "Temperature"
+                        breach_type = "Temp"
                         alert_messages.append(f"Temperature breach: {internal_temp}°C (required: {low_temp}°C - {high_temp}°C)")
 
                 if humidity > humidity_limit:
@@ -84,7 +84,7 @@ def start_temperature_monitor(socketio, app):
                     alert_messages.append(humidity_msg)
                     
                     if breach_type:
-                        breach_type = "Humidity and Temperature"
+                        breach_type = "Temp+Humidity"
                     else:
                         breach_type = "Humidity"
 
@@ -93,7 +93,7 @@ def start_temperature_monitor(socketio, app):
                     severity = "low"
                     
                     temp_deviation = 0
-                    if "Temperature" in breach_type:
+                    if "Temp" in breach_type:
                         temp_deviation = max(
                             abs(internal_temp - low_temp) if internal_temp < low_temp else 0,
                             abs(internal_temp - high_temp) if internal_temp > high_temp else 0
@@ -103,7 +103,7 @@ def start_temperature_monitor(socketio, app):
                     if "Humidity" in breach_type:
                         humidity_excess = humidity - humidity_limit
                     
-                    if "Temperature" in breach_type:
+                    if "Temp" in breach_type:
                         if temp_deviation > 4:
                             severity = "very high"
                         elif temp_deviation > 2:
@@ -119,7 +119,9 @@ def start_temperature_monitor(socketio, app):
                             severity = "medium"
                     
                     alert_message = " | ".join(alert_messages)
-                    create_alert(shipment.id, breach_type.lower().replace(" ", "_"), severity, alert_message)
+                    # Convert to lowercase and handle special characters for database storage
+                    alert_type = breach_type.lower().replace("+", "_and_")
+                    create_alert(shipment.id, alert_type, severity, alert_message)
 
                 data = {
                     'timestamp': timestamp,
