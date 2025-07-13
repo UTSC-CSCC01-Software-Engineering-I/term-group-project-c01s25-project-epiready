@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect, use } from 'react';
+import { LineChart, CartesianGrid, XAxis, YAxis, Line } from 'recharts';
 import Navbar from '../components/Navbar';
 import MapComponent from '../components/maps/MapComponent';
 import { useGlobal } from '../LoggedIn';
@@ -18,6 +19,7 @@ export default function ShipmentPage() {
   const socket = useSocket();
 
   const googleMapsApiKey = import.meta.env.VITE_MAPS_KEY;
+  const data = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page B', uv: 300, pv: 2400, amt: 2400}, {name: 'Page C', uv: 200, pv: 2400, amt: 2400}, {name: 'Page D', uv: 278, pv: 2400, amt: 2400}, {name: 'Page E', uv: 189, pv: 2400, amt: 2400}];
 
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function ShipmentPage() {
         lat: prev.lat + 0.001,
         lng: prev.lng + 0.001
       }));
-    }, 1000);
+    }, 100000);
     return () => clearInterval(interval);
   }, []);
 
@@ -208,6 +210,19 @@ export default function ShipmentPage() {
                 personLocation={position} 
                 googleMapsApiKey={googleMapsApiKey} 
               />
+            </div>
+          </div>
+        )}
+        {tab === 'graphs' && (
+          <div className="w-full flex justify-center items-center">
+            <div style={{ width: "100%", minHeight: 600 }}>
+              <LineChart width={500} height={300} data={data}>
+                <CartesianGrid stroke="#eee" strokeDasharray="5 5"/>
+                <XAxis dataKey="name"/>
+                <YAxis/>
+                <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+                <Line type="monotone" dataKey="pv" stroke="#82ca9d" />
+              </LineChart>
             </div>
           </div>
         )}
