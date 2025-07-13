@@ -4,7 +4,7 @@ import axios from "axios";
 export default function AuthForm({ type }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/auth/${type}`;
+  const endpoint = `${import.meta.env.VITE_BACKEND_URL}/api/auth/${type}`;
 
   async function handleSubmit(e) {
     e.preventDefault();
