@@ -30,8 +30,8 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
         run: |
-          docker tag frontend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
-          docker tag backend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
+          docker tag frontend ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
+          docker tag backend ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
           docker images
