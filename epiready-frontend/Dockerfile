@@ -7,6 +7,14 @@ WORKDIR /app
 # Copy package.json and package-lock.json (or yarn.lock)
 COPY package*.json ./
 
+
+ARG VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
+ARG VITE_MAPS_KEY
+ENV VITE_MAPS_KEY=$VITE_MAPS_KEY
+
+
 # Install dependencies
 RUN npm install
 
