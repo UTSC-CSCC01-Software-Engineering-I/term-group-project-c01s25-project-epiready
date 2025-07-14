@@ -14,11 +14,11 @@ services: # Start with this tag. This will contain all the containers you want t
     build: # Build the image from the Dockerfile
       context: ./epiready-frontend # Path to the Dockerfile
       dockerfile: Dockerfile  # Name of the Dockerfile
+      args:
+        VITE_MAPS_KEY: ${VITE_MAPS_KEY}
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     container_name: epiready-frontend
     image: epiready-frontend:latest # Name of the image
-    args:
-      VITE_MAPS_KEY: ${VITE_MAPS_KEY}
-      VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     ports:
       - '80:80' # Nginx runs on port 80 by default
     restart: always
