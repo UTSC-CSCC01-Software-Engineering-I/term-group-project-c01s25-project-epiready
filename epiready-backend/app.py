@@ -18,6 +18,8 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv("SECRET_KEY")
 
+    print("CORS_ORIGIN:", os.getenv("CORS_ORIGIN"))
+
     CORS(app, origins=os.getenv("CORS_ORIGIN"), supports_credentials=True)
     init_db(app)
     
