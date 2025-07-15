@@ -2,9 +2,11 @@ import random
 from datetime import datetime, timezone
 from flask import request, jsonify
 from models.shipment import Shipment
+from models.user import User
 from models.alert import Alert, ActionLog
 from config.database import db
 from auth.auth import token_required
+from flask_mail import Message, Mail
 import eventlet
 
 def parse_temp_range(temp_range):
@@ -41,21 +43,18 @@ def create_alert(shipment_id, alert_type, severity, message):
         print(f"Error creating alert: {e}")
         return None
 
-def start_temperature_monitor(socketio, app):
+def start_temperature_monitor(socketio, app, mail):
     with app.app_context():
-        print("Starting")
+        emails_sent = 0
+        max_emails = 2
         while True:
             internal_temp = round(random.uniform(2, 10), 2)
             external_temp = round(random.uniform(0, 35), 2)
             humidity = round(random.uniform(10, 85), 2)
             timestamp = datetime.now(timezone.utc).isoformat()
-            
-            print("query")
 
             shipments = Shipment.query.filter_by(status='active').all()
             
-            print(shipments)
-
             for shipment in shipments:
                 lat, lon = (None, None)
                 if shipment.current_location:
@@ -88,8 +87,35 @@ def start_temperature_monitor(socketio, app):
                     else:
                         breach_type = "Humidity"
 
-                # Create alert in database if there's a breach
+                # Create alert in database if there's a breach and send email
                 if breach:
+                    
+                    if emails_sent < max_emails:
+                        emails_sent += 1
+                        
+                        user = User.query.get(shipment.user_id)
+                        user_email = user.email
+                        
+                        subject = f"Breach Alert: Shipment '{shipment.name}'"
+                        body = f"A {breach_type} breach has occurred in your shipment."
+                        
+                        message = Message(
+                            subject=subject,
+                            sender=app.config['MAIL_USERNAME'],
+                            recipients=[user_email],
+                            body=body
+                        )
+                        
+                        print("sending message ", shipment.name, " with email ", user_email, "total sent", emails_sent)
+                        try:
+                            mail.send(message)
+                        except Exception as e:
+                            print(f"Invalid email to {user_email} error: {str(e)}")
+                            
+                    else:
+                        print("skipping breach email", emails_sent)
+                        
+                    
                     severity = "low"
                     
                     temp_deviation = 0
