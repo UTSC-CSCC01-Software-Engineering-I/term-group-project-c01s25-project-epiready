@@ -9,7 +9,7 @@ import uuid
 @token_required
 def create_shipment_action(user_id):
     """
-    POST /shipments/<shipment_id>/actions
+    POST /actions
     
     Creates a new action for a specific shipment.
     
@@ -27,9 +27,9 @@ def create_shipment_action(user_id):
     - 403 Forbidden: "Access denied. You can only create actions for your own shipments."
     - 401 Unauthorized: "Session token was invalid."
     """
-    
-    # Get shipment_id from URL
-    shipment_id = request.view_args.get('shipment_id')
+
+    data = request.get_json()
+    shipment_id = data.get("shipment_id")
     if not shipment_id:
         return jsonify({'error': 'Shipment ID is required'}), 400
     
@@ -70,7 +70,7 @@ def create_shipment_action(user_id):
 @token_required
 def get_shipment_actions(user_id):
     """
-    GET /shipments/<shipment_id>/actions
+    GET /actions
     
     Get all actions for a specific shipment.
     - Regular users: Can only access actions for their own shipments
@@ -82,7 +82,8 @@ def get_shipment_actions(user_id):
     - 401 Unauthorized: "Session token was invalid."
     """
     
-    shipment_id = request.view_args.get('shipment_id')
+    data = request.get_json()
+    shipment_id = data.get("shipment_id")
     if not shipment_id:
         return jsonify({'error': 'Shipment ID is required'}), 400
     
@@ -103,9 +104,9 @@ def get_shipment_actions(user_id):
         return jsonify({'error': str(e)}), 500
 
 @token_required
-def get_action_by_id(user_id):
+def get_action_by_id(user_id, action_id):
     """
-    GET /shipments/<shipment_id>/actions/<action_id>
+    GET /actions/<action_id>
     
     Get a specific action by ID.
     - Regular users: Can only access actions for their own shipments
@@ -117,7 +118,8 @@ def get_action_by_id(user_id):
     - 401 Unauthorized: "Session token was invalid."
     """
     
-    shipment_id = request.view_args.get('shipment_id')
+    data = request.get_json()
+    shipment_id = data.get("shipment_id")
     action_id = request.view_args.get('action_id')
     
     if not shipment_id or not action_id:
@@ -143,9 +145,9 @@ def get_action_by_id(user_id):
         return jsonify({'error': str(e)}), 500
 
 @token_required
-def update_action_status(user_id):
+def update_action_status(user_id, action_id):
     """
-    PATCH /shipments/<shipment_id>/actions/<action_id>
+    PATCH /actions/<action_id>
     
     Update the status of a specific action.
     - Regular users: Can only update actions for their own shipments
@@ -160,7 +162,8 @@ def update_action_status(user_id):
     - 401 Unauthorized: "Session token was invalid."
     """
     
-    shipment_id = request.view_args.get('shipment_id')
+    data = request.get_json()
+    shipment_id = data.get("shipment_id")
     action_id = request.view_args.get('action_id')
     
     if not shipment_id or not action_id:
@@ -193,4 +196,69 @@ def update_action_status(user_id):
         return jsonify(action.to_dict()), 200
     except Exception as e:
         db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@token_required
+def get_user_action_history(auth_user_id, user_id):
+    """
+    GET /api/users/<user_id>/actions
+    
+    Get all actions for the authenticated user across all their shipments.
+    - Regular users: Can only access their own actions
+    - Transporter managers: Can access actions for any user
+    
+    Query Parameters:
+    - action_type (optional): Filter actions by type
+    - status (optional): Filter actions by status
+    - limit (optional): Limit number of results (default: 50, max: 200)
+    - offset (optional): Offset for pagination (default: 0)
+    
+    Possible Error Responses:
+    - 403 Forbidden: "Access denied. You can only view your own actions."
+    - 401 Unauthorized: "Session token was invalid."
+    """
+    
+    request_user_id = request.view_args.get('user_id')
+
+    # Only allow if requesting your own history or you're a manager
+    auth_user = User.query.get(auth_user_id)
+    if auth_user.role != "transporter_manager" and auth_user_id != user_id:
+        return jsonify({"error": "Access denied. You can only view your own actions."}), 403
+
+    
+    try:
+        action_type = request.args.get('action_type')
+        status_filter = request.args.get('status')
+        limit = min(int(request.args.get('limit', 50)), 200)
+        offset = int(request.args.get('offset', 0))
+        
+        user_shipments = Shipment.query.filter_by(user_id=request_user_id).all()
+        shipment_ids = [s.id for s in user_shipments]
+        
+        if not shipment_ids:
+            return jsonify({
+                'actions': [],
+                'total_count': 0,
+                'has_more': False
+            }), 200
+        
+        query = ShipmentAction.query.filter(ShipmentAction.shipment_id.in_(shipment_ids))
+        
+        if action_type:
+            query = query.filter(ShipmentAction.action_type == action_type)
+        if status_filter:
+            query = query.filter(ShipmentAction.status == status_filter)
+        
+        total_count = query.count()
+        
+        actions = query.order_by(ShipmentAction.created_at.desc()).offset(offset).limit(limit).all()
+        
+        return jsonify({
+            'actions': [action.to_dict() for action in actions],
+            'total_count': total_count,
+            'has_more': (offset + limit) < total_count,
+            'limit': limit,
+            'offset': offset
+        }), 200
+    except Exception as e:
         return jsonify({'error': str(e)}), 500 

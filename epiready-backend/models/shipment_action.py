@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from config.database import db
-from sqlalchemy import event
+from sqlalchemy.orm import validates 
 
 class ShipmentAction(db.Model):
     __tablename__ = 'shipment_actions'
@@ -36,7 +36,14 @@ class ShipmentAction(db.Model):
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
         }
 
-@event.listens_for(ShipmentAction, 'before_update')
-def validate_completed_action(target):
-    if target.status == 'completed' and not target.completed_at:
-        target.completed_at = datetime.now(timezone.utc) 
+@validates("status")
+def validate_completed_action(self, key, status):
+    allowed = {"active", "in_progress", "completed"}
+    if status not in allowed:
+        raise ValueError(f"status must be one of {allowed}")
+
+    # stamp timestamp if completing
+    if status == "completed" and self.completed_at is None:
+        self.completed_at = datetime.now(timezone.utc)
+
+    return status
