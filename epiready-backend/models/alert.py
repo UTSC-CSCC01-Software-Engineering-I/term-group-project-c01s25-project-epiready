@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from config.database import db
-from sqlalchemy import event
 
 class Alert(db.Model):
     __tablename__ = 'alerts'
@@ -32,11 +31,6 @@ class Alert(db.Model):
             'resolved_at': self.resolved_at.isoformat() if self.resolved_at else None
         }
 
-@event.listens_for(Alert, 'before_update')
-def validate_resolved_alert(target):
-    if target.status == 'resolved' and not target.resolved_at:
-        target.resolved_at = datetime.now(timezone.utc)
-
 class ActionLog(db.Model):
     __tablename__ = 'action_logs'
 
@@ -60,9 +54,4 @@ class ActionLog(db.Model):
             'details': self.details,
             'created_at': self.created_at.isoformat(),
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
-        }
-
-@event.listens_for(ActionLog, 'before_update')
-def validate_completed_action(target):
-    if target.status == 'completed' and not target.completed_at:
-        target.completed_at = datetime.now(timezone.utc) 
+        } 

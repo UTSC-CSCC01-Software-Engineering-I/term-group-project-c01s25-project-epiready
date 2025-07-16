@@ -252,6 +252,10 @@ def update_alert_status(user_id, alert_id):
         
         old_status = alert.status
         alert.status = status
+
+        # Set resolved_at if status is resolved
+        if status == 'resolved' and not alert.resolved_at:
+            alert.resolved_at = datetime.now(timezone.utc)
         
         # Create an action log when status changes
         if old_status != status:
