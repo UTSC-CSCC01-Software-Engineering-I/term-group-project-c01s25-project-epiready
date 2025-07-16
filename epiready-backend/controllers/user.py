@@ -2,6 +2,7 @@ from flask import jsonify, request
 from models.user import User
 from auth.auth import token_required
 from config.database import db
+from models.organization import Organization
 
 @token_required
 def get_user(user_id):
@@ -74,3 +75,48 @@ def get_all_users(user_id):
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@token_required
+def create_organization(user_id):
+    data = request.get_json()
+    name = data.get('name')
+    join_code = data.get('join_code')
+    if not name or not join_code:
+        return jsonify({'error': 'Organization name and join code are required.'}), 400
+    if Organization.query.filter_by(name=name).first():
+        return jsonify({'error': 'Organization name already exists.'}), 400
+    if Organization.query.filter_by(join_code=join_code).first():
+        return jsonify({'error': 'Join code already exists.'}), 400
+    org = Organization(name=name, join_code=join_code)
+    db.session.add(org)
+    db.session.commit()
+    return jsonify(org.to_dict()), 201
+
+@token_required
+def join_organization(user_id):
+    from models.user import User
+    data = request.get_json()
+    join_code = data.get('join_code')
+    if not join_code:
+        return jsonify({'error': 'Join code is required.'}), 400
+    user = User.query.get(user_id)
+    if hasattr(user, 'organization_id') and user.organization_id:
+        return jsonify({'error': 'User already belongs to an organization.'}), 400
+    org = Organization.query.filter_by(join_code=join_code).first()
+    if not org:
+        return jsonify({'error': 'Invalid join code.'}), 404
+    user.organization_id = org.id
+    db.session.commit()
+    return jsonify({'message': 'Joined organization successfully.', 'organization': org.to_dict()}), 200
+
+@token_required
+def get_organization_by_id(user_id):
+    from models.organization import Organization
+    data = request.get_json()
+    org_id = data.get('id')
+    if not org_id:
+        return jsonify({'error': 'Organization id is required.'}), 400
+    org = Organization.query.get(org_id)
+    if not org:
+        return jsonify({'error': 'Organization not found.'}), 404
+    return jsonify(org.to_dict()), 200
