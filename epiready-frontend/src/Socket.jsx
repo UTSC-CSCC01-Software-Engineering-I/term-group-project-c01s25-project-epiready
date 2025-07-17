@@ -1,8 +1,7 @@
+/* global process */
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useGlobal } from "./LoggedIn";
-import { dotenv } from 'dotenv';
-;
 
 const SocketContext = createContext(null);
 

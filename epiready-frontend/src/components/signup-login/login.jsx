@@ -1,12 +1,10 @@
+/* global process */
 import React, { useState } from "react";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import {useGlobal} from "../../LoggedIn";
 import { LoadingSpinner } from "../widgets/LoadingSpinner";
 import { SuccessTick } from "../widgets/SuccessTick";
-import { dotenv } from 'dotenv';
-
-;
 
 export default function LoginPopup({ trigger }) {
     const [loginError, setLoginError] = useState(false);

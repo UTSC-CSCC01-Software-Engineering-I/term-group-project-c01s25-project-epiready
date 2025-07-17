@@ -1,12 +1,10 @@
+/* global process */
 import { useEffect, useState } from "react";
 import ShipmentCard from "./ShipmentCard";
 import styles from "./AddShipment.module.css";
 import { useGlobal } from "../../LoggedIn";
 import AddShipmentPopup from "./AddShipment";
 import { LoadingSpinner } from "../widgets/LoadingSpinner";
-import { dotenv } from 'dotenv';
-
-;
 
 export default function ShowShipments() {
     const [shipments, setShipments] = useState([]);

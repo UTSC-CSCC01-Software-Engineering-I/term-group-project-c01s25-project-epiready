@@ -1,3 +1,4 @@
+/* global process */
 import { useParams } from 'react-router-dom';
 import { useState, useEffect} from 'react';
 import Navbar from '../components/Navbar';
@@ -5,8 +6,6 @@ import MapComponent from '../components/maps/MapComponent';
 import { useGlobal } from '../LoggedIn';
 import { useSocket } from '../Socket';
 import ActionModal from '../components/Shipment/ActionModal';
-import {dotenv} from 'dotenv';
-;
 
 
 export default function ShipmentPage() {

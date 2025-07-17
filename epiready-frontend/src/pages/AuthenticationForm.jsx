@@ -1,7 +1,7 @@
+/* global process */
 import { useState } from "react";
 import axios from "axios";
-import { dotenv } from 'dotenv';
-;
+
 
 export default function AuthForm({ type }) {
   const [email, setEmail] = useState("");

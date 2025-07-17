@@ -1,10 +1,9 @@
+/* global process */
 import React, { useState } from "react";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import { LoadingSpinner } from "../widgets/LoadingSpinner";
 import { SuccessTick } from "../widgets/SuccessTick";
-import { dotenv } from 'dotenv';
-;
 
 export default function SignupPopup({ trigger }) {
   const [message, setMessage] = useState(null);
