@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect} from 'react';
 import Navbar from '../components/Navbar';
 import MapComponent from '../components/maps/MapComponent';
 import { useGlobal } from '../LoggedIn';
@@ -13,7 +13,9 @@ export default function ShipmentPage() {
   const [shipmentDetails, setShipmentDetails] = useState(null);
   const [liveData, setLiveData] = useState(null);
   const [position, setPosition] = useState({ lat: 43.6800, lng: -79.4000 });
+  // eslint-disable-next-line
   const [origin, setOrigin] = useState({ lat: 43.6532, lng: -79.3832 });
+  // eslint-disable-next-line
   const [destination, setDestination] = useState({ lat: 43.7001, lng: -79.4163 });
   const [showActionModal, setShowActionModal] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -80,7 +82,7 @@ export default function ShipmentPage() {
         if (!response.ok) throw new Error("Failed to add action");
         return response.json();
       })
-      .then((data) => {
+      .then(() => {
         setShowActionModal(false);
         setActionError("");
         setActionLoading(false);

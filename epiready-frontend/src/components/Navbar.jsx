@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import NavbarLink from "./NavbarLink";
 import SignupPopup from "./signup-login/signup";
 import LoginPopup from "./signup-login/login";
+// eslint-disable-next-line
 import { hover } from "framer-motion";
 import { useGlobal } from "../LoggedIn";
 

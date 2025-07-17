@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ShipmentCard from "./ShipmentCard";
 import styles from "./AddShipment.module.css";
 import { useGlobal } from "../../LoggedIn";
@@ -13,7 +13,7 @@ export default function ShowShipments() {
     const [page, setPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const pageSize = 15;
-    const {loggedIn, setLoggedIn} = useGlobal();
+    const {loggedIn} = useGlobal();
 
     const addShipment = (
         <div className={styles.addShipment}>
@@ -49,7 +49,7 @@ export default function ShowShipments() {
             setTotalCount(res.total_count || 0);
             setIsLoading(false);
         })
-        .catch(e => {
+        .catch(() => {
             setError("Unable to get shipments, please try again later.");
             setIsLoading(false);
         });

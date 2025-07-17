@@ -42,7 +42,11 @@ export default function SignupPopup({ trigger }) {
         let data = {};
         try {
           data = await res.json();
-        } catch (e) {}
+          // eslint-disable-next-line
+        } catch (e) {
+          setSignupError(true);
+          setMessage("An error occurred while processing your request. Please try again.");
+        }
         if (!res.ok || data.error) {
           setSignupError(true);
           setMessage(
@@ -51,13 +55,10 @@ export default function SignupPopup({ trigger }) {
           // Clear fields on error
           form.email.value = "";
           form.password.value = "";
-          throw new Error(
-            data.error || "Something unexpected happened. Please try again later"
-          );
         }
         return data;
       })
-      .then((res) => {
+      .then(() => {
         setIsSuccess(true);
         setMessage("Signed up successfully");
         setSignupError(false);
@@ -65,10 +66,6 @@ export default function SignupPopup({ trigger }) {
         setTimeout(() => {
           close();
         }, 2000);
-      })
-      .catch((error) => {
-        // Error already handled above, but log for debugging
-        console.error("Signup error:", error);
       })
       .finally(() => {
         setIsLoading(false);

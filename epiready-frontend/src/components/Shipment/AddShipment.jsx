@@ -67,6 +67,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
         let data = {};
         try {
           data = await res.json();
+          // eslint-disable-next-line
         } catch (e) {
           setMessage(`Error ${res.status}: Something unexpected happened. Please try again later`);
           setAddError(true);
@@ -79,7 +80,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
         }
         return data;
     })
-    .then((res) => {
+    .then(() => {
         setMessage(null);
         setIsSuccess(true);
         setIsLoading(false);

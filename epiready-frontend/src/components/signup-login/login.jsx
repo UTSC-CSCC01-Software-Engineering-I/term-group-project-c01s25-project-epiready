@@ -10,6 +10,7 @@ export default function LoginPopup({ trigger }) {
     const [message, setMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    // eslint-disable-next-line
     const {loggedIn, setLoggedIn} = useGlobal();
 
   const handleLogin = (e, close) => {

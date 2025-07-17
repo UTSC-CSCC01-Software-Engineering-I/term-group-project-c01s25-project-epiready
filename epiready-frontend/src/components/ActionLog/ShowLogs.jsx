@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ActionLog from "./ActionLog";
 import { useSocket } from '../../Socket';
 import { useGlobal } from "../../LoggedIn";
@@ -53,7 +53,7 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
         setLogComponent(actions);
     }, [logs]);
 
-    const fetchLogs = (newPage = page) => {
+    const fetchLogs = () => {
         setIsLoading(true);
         fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alerts?active=true&page=${page}`, {
             method: "GET",
@@ -71,6 +71,7 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
             setTotalCount(data.total_count || 0);
             setAlertError(null);
             setIsLoading(false);
+            // eslint-disable-next-line
         }).catch((e) => {
             setAlertError("Unable to get the alerts, please try again later.");
             setIsLoading(false);
