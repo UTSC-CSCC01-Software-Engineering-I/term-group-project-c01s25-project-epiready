@@ -3,6 +3,9 @@ import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import { LoadingSpinner } from "../widgets/LoadingSpinner";
 import { SuccessTick } from "../widgets/SuccessTick";
+import {dotenv} from 'dotenv';
+
+;
 
 export default function AddShipmentPopup({ trigger, setAdded }) {
   const [message, setMessage] = useState(null);
@@ -38,7 +41,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
     const destination = form.destination.value;
     const time = form.hours.value;
 
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments`,
+    fetch(`${process.env.VITE_BACKEND_URL}/api/shipments`,
         {
             method: "POST",
             body: JSON.stringify({

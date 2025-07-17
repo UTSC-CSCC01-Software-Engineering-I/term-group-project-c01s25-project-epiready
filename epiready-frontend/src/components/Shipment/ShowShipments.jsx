@@ -4,6 +4,9 @@ import styles from "./AddShipment.module.css";
 import { useGlobal } from "../../LoggedIn";
 import AddShipmentPopup from "./AddShipment";
 import { LoadingSpinner } from "../widgets/LoadingSpinner";
+import { dotenv } from 'dotenv';
+
+;
 
 export default function ShowShipments() {
     const [shipments, setShipments] = useState([]);
@@ -33,7 +36,7 @@ export default function ShowShipments() {
     const fetchShipments = (newPage = page) => {
         setIsLoading(true);
         setError(null);
-        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments?page=${newPage}`, {
+        fetch(`${process.env.VITE_BACKEND_URL}/api/shipments?page=${newPage}`, {
             method: "GET",
             headers: {
                 'Authorization': sessionStorage.getItem("token"),

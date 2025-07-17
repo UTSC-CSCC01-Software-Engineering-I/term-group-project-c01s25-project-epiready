@@ -4,6 +4,9 @@ import "reactjs-popup/dist/index.css";
 import {useGlobal} from "../../LoggedIn";
 import { LoadingSpinner } from "../widgets/LoadingSpinner";
 import { SuccessTick } from "../widgets/SuccessTick";
+import { dotenv } from 'dotenv';
+
+;
 
 export default function LoginPopup({ trigger }) {
     const [loginError, setLoginError] = useState(false);
@@ -24,7 +27,7 @@ export default function LoginPopup({ trigger }) {
     const email = form.email.value;
     const password = form.password.value;
 
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
+    fetch(`${process.env.VITE_BACKEND_URL}/api/auth/login`,
         {
             method: "POST",
             body: JSON.stringify({

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
+import { dotenv } from 'dotenv';
+;
 
 export default function AuthForm({ type }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const endpoint = `${import.meta.env.VITE_BACKEND_URL}/api/auth/${type}`;
+  const endpoint = `${process.env.VITE_BACKEND_URL}/api/auth/${type}`;
 
   async function handleSubmit(e) {
     e.preventDefault();

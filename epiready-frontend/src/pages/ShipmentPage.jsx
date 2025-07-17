@@ -5,6 +5,8 @@ import MapComponent from '../components/maps/MapComponent';
 import { useGlobal } from '../LoggedIn';
 import { useSocket } from '../Socket';
 import ActionModal from '../components/Shipment/ActionModal';
+import {dotenv} from 'dotenv';
+;
 
 
 export default function ShipmentPage() {
@@ -23,7 +25,7 @@ export default function ShipmentPage() {
   const { loggedIn } = useGlobal();
   const socket = useSocket();
 
-  const googleMapsApiKey = import.meta.env.VITE_MAPS_KEY;
+  const googleMapsApiKey = process.env.VITE_MAPS_KEY;
 
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function ShipmentPage() {
 
 
   const fetchShipmentDetails = () => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${name}`, {
+    fetch(`${process.env.VITE_BACKEND_URL}/api/shipments/${name}`, {
       method: 'GET',
       headers: {
         'Authorization': sessionStorage.getItem('token'),
@@ -70,7 +72,7 @@ export default function ShipmentPage() {
   const createActionLog = (action, cb) => {
     setActionError("");
     setActionLoading(true);
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
+    fetch(`${process.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
       method: 'POST',
       headers: {
         'Authorization': sessionStorage.getItem('token'),
