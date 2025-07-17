@@ -4,7 +4,7 @@ from models.shipment import Shipment
 from models.user import User
 from config.database import db
 from auth.auth import token_required
-import uuid
+from datetime import datetime, timezone
 
 @token_required
 def create_shipment_action(user_id):
@@ -189,6 +189,8 @@ def update_action_status(user_id, action_id):
             return jsonify({'error': 'Action not found'}), 404
         
         action.status = data['status']
+        if action.status == 'completed' and not action.completed_at:
+            action.completed_at = datetime.now(timezone.utc)
         if 'action_metadata' in data:
             action.action_metadata = data['action_metadata']
         

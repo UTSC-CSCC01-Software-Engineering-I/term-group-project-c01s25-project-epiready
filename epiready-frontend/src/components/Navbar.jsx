@@ -26,6 +26,9 @@ export default function Navbar({ currentPage }) {
         <NavbarLink to="/monitor" currentPage={currentPage}>
           Monitor
         </NavbarLink>
+        <NavbarLink to="/organization" currentPage={currentPage}>
+          Organization
+        </NavbarLink>
         <SignupPopup trigger={<button className="hover:bg-green-600 hover:text-black" style={{border: "2px solid green", 
           fontWeight:"600", margin: "2px", padding: "5px", borderRadius: "10%", minWidth: "70px"}}>Sign up</button>}/>
         <LoginPopup trigger={<button className="hover:bg-green-600 hover:text-black" style={{border: "2px solid green", 
