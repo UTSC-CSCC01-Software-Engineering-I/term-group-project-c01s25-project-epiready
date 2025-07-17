@@ -31,7 +31,8 @@ def create_alert(shipment_id, alert_type, severity, message):
             type=alert_type,
             severity=severity,
             message=message,
-            status='active'
+            status='active',
+            active=True
         )
         db.session.add(alert)
         db.session.commit()
@@ -41,9 +42,16 @@ def create_alert(shipment_id, alert_type, severity, message):
         print(f"Error creating alert: {e}")
         return None
 
+def severity_rank(severity):
+    ranks = {"low": 1, "medium": 2, "high": 3, "very high": 4}
+    return ranks.get(severity, 0)
+
+previous_alerts = {}
+
 def start_temperature_monitor(socketio, app):
     with app.app_context():
         print("Starting")
+
         while True:
             internal_temp = round(random.uniform(2, 10), 2)
             external_temp = round(random.uniform(0, 35), 2)
@@ -119,9 +127,36 @@ def start_temperature_monitor(socketio, app):
                             severity = "medium"
                     
                     alert_message = " | ".join(alert_messages)
-                    create_alert(shipment.id, breach_type.lower().replace(" ", "_"), severity, alert_message)
-                    socketio.emit('breach_alert', room=str(shipment.user_id))
+                    prev = previous_alerts.get(shipment.id)
+                    should_emit = False
+                    if prev:
+                        # Only emit if message is different and severity is worse
+                        if (prev['breach'] == False or (alert_message != prev['message'] and severity_rank(severity) > severity_rank(prev['severity']))):
+                            should_emit = True
+                    else:
+                        # No previous alert, always emit
+                        should_emit = True
 
+                    if should_emit:
+                        alert_obj = create_alert(shipment.id, breach_type.lower().replace(" ", "_"), severity, alert_message)
+                        print(f"Creating alert for shipment {shipment.id}: {alert_message} (severity: {severity}), previous: {prev} ")
+                        socketio.emit(
+                            'breach_alert',
+                            {
+                                'message': alert_message,
+                                'severity': severity,
+                                'shipment_id': shipment.id,
+                                'shipment_name': getattr(shipment, 'name', None),
+                                'id': getattr(alert_obj, 'id', None),
+                                'timestamp': getattr(alert_obj, 'created_at', datetime.now(timezone.utc)).isoformat() if alert_obj else datetime.now(timezone.utc).isoformat()
+                            },
+                            room=str(shipment.user_id)
+                        )
+                    
+                    previous_alerts[shipment.id] = {'message': alert_message, 'severity': severity, 'breach': True}
+                
+                else:
+                    previous_alerts[shipment.id] = {'breach': False}
 
                 data = {
                     'timestamp': timestamp,
@@ -150,6 +185,8 @@ def get_alerts_for_user(user_id):
     Query Parameters:
     - shipment_id (optional): Filter alerts by specific shipment
     - status (optional): Filter alerts by status (active, inprogress, resolved)
+    - active (optional): Filter alerts by active status (true, false)
+    - page (optional): Page number for pagination
     
     Possible Error Responses:
     - 401 Unauthorized: "Session token was invalid."
@@ -157,6 +194,8 @@ def get_alerts_for_user(user_id):
     try:
         shipment_id = request.args.get('shipment_id')
         status_filter = request.args.get('status')
+        active_filter = request.args.get('active', 'false').lower() == 'true'
+        page = request.args.get('page', 1, type=int)
         
         # Get user's shipments
         user_shipments = Shipment.query.filter_by(user_id=user_id).all()
@@ -170,19 +209,32 @@ def get_alerts_for_user(user_id):
         
         # Filter by specific shipment if provided
         if shipment_id and shipment_id in shipment_ids:
-            alerts = Alert.query.filter_by(shipment_id=shipment_id).order_by(Alert.created_at.desc()).all()
+            base_query = Alert.query.filter_by(shipment_id=shipment_id)
         else:
-            alerts = Alert.query.filter(Alert.shipment_id.in_(shipment_ids)).order_by(Alert.created_at.desc()).all()
-        
-        alert_dicts = [alert.to_dict() for alert in alerts]
-        
+            base_query = Alert.query.filter(Alert.shipment_id.in_(shipment_ids))
+
+        # Get total count before pagination
+        total_count = base_query.count()
+
+        alerts = base_query.order_by(Alert.id.desc()).limit(25).offset((page - 1) * 25).all()
+
+        # Add shipment name to each alert dict
+        shipment_id_to_name = {s.id: s.name for s in user_shipments}
+        alert_dicts = []
+        for alert in alerts:
+            alert_data = alert.to_dict()
+            alert_data['shipment_name'] = shipment_id_to_name.get(alert.shipment_id, None)
+            alert_dicts.append(alert_data)
+
         # Apply status filter if provided
         if status_filter:
             alert_dicts = [alert for alert in alert_dicts if alert['status'] == status_filter]
-        
+        if active_filter:
+            alert_dicts = [alert for alert in alert_dicts if alert['active'] == True]
+
         return jsonify({
             'alerts': alert_dicts,
-            'total_count': len(alert_dicts)
+            'total_count': total_count
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -263,6 +315,51 @@ def update_alert_status(user_id, alert_id):
             )
             db.session.add(action_log)
         
+        db.session.commit()
+        return jsonify(alert.to_dict()), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@token_required
+def update_alert_active(user_id, alert_id):
+    """
+    PATCH /api/alerts/<alert_id>/active
+    
+    Update the active status of an alert.
+    
+    Required fields:
+    - active: New active status (true, false)
+    
+    Possible Error Responses:
+    - 400 Bad Request: "Active field is required"
+    - 404 Not Found: "Alert not found"
+    - 403 Forbidden: "Access denied. You can only update your own alerts."
+    - 401 Unauthorized: "Session token was invalid."
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'active' not in data:
+            return jsonify({'error': 'Active field is required'}), 400
+
+        active = data['active']
+        if not isinstance(active, bool):
+            return jsonify({'error': 'Active field must be a boolean'}), 400
+
+        alert = Alert.query.get(alert_id)
+        if not alert:
+            return jsonify({'error': 'Alert not found or access denied'}), 404
+        
+        # Check if user owns the shipment associated with this alert
+        shipment = Shipment.query.filter_by(id=alert.shipment_id, user_id=user_id).first()
+        if not shipment:
+            return jsonify({'error': 'Alert not found or access denied'}), 404
+        
+        old_active = alert.active
+        alert.active = active
+
         db.session.commit()
         return jsonify(alert.to_dict()), 200
     except Exception as e:

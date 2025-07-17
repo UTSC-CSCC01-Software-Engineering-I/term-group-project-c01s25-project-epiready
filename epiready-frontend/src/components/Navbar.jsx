@@ -3,8 +3,16 @@ import NavbarLink from "./NavbarLink";
 import SignupPopup from "./signup-login/signup";
 import LoginPopup from "./signup-login/login";
 import { hover } from "framer-motion";
+import { useGlobal } from "../LoggedIn";
 
 export default function Navbar({ currentPage }) {
+  const { loggedIn, setLoggedIn } = useGlobal();
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    setLoggedIn(false);
+  };
+
   return (
     <nav className="w-screen flex justify-center items-center bg-black mt-0 min-h-16 h-16 border-b-1 border-neutral-600 drop-shadow-xl drop-shadow-neutral-700/40 overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-600">
       <div className="w-9/10 sm:w-4/5 h-full flex gap-4 items-center">
@@ -26,10 +34,20 @@ export default function Navbar({ currentPage }) {
         <NavbarLink to="/monitor" currentPage={currentPage}>
           Monitor
         </NavbarLink>
+        {loggedIn ? (
+          <button
+            className="hover:bg-red-600 hover:text-black"
+            style={{ border: "2px solid red", fontWeight: "600", margin: "2px", padding: "5px", borderRadius: "10%", minWidth: "70px" }}
+            onClick={handleLogout}
+          >
+            Sign Out
+          </button>
+        ) : (
+          <LoginPopup trigger={<button className="hover:bg-green-600 hover:text-black" style={{border: "2px solid green", 
+          fontWeight:"600", padding: "5px", margin: "2px", borderRadius: "10%", minWidth: "70px"}}>Log In</button>}/>
+        )}
         <SignupPopup trigger={<button className="hover:bg-green-600 hover:text-black" style={{border: "2px solid green", 
           fontWeight:"600", margin: "2px", padding: "5px", borderRadius: "10%", minWidth: "70px"}}>Sign up</button>}/>
-        <LoginPopup trigger={<button className="hover:bg-green-600 hover:text-black" style={{border: "2px solid green", 
-          fontWeight:"600", padding: "5px", margin: "2px", borderRadius: "10%", minWidth: "70px"}}>Log In</button>}/>
       </div>
     </nav>
   );

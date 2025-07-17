@@ -11,6 +11,7 @@ class Alert(db.Model):
     severity = db.Column(db.String(10), nullable=False)  # low, medium, high
     message = db.Column(db.String(200), nullable=False)
     status = db.Column(db.String(20), nullable=False)  # active, inprogress, resolved
+    active = db.Column(db.Boolean, default=True, nullable=True)
     
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False)
     resolved_at = db.Column(db.DateTime)
@@ -28,14 +29,16 @@ class Alert(db.Model):
             'severity': self.severity,
             'message': self.message,
             'status': self.status,
+            'active': self.active,
             'created_at': self.created_at.isoformat(),
             'resolved_at': self.resolved_at.isoformat() if self.resolved_at else None
         }
 
 @event.listens_for(Alert, 'before_update')
-def validate_resolved_alert(target):
-    if target.status == 'resolved' and not target.resolved_at:
-        target.resolved_at = datetime.now(timezone.utc)
+def validate_resolved_alert(target, *args, **kwargs):
+    if isinstance(target, Alert):
+        if target.status == 'resolved' and not target.resolved_at:
+            target.resolved_at = datetime.now(timezone.utc)
 
 class ActionLog(db.Model):
     __tablename__ = 'action_logs'

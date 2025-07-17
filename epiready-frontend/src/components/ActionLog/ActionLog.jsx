@@ -8,13 +8,13 @@ export default function ActionLog({ type, onDestroy, id, msg, isHome = false }) 
   let msgColor = classes.Notice;
   let statusMessage = "Notice";
 
-  if (type === 1) {
+  if (type.trim() === 'very high') {
     msgColor = classes.Critical;
     statusMessage = "Critical";
-  } else if (type === 2) {
+  } else if (type.trim() === 'medium') {
     msgColor = classes.Warning;
     statusMessage = "Warning";
-  } else if (type === 3) {
+  } else if (type.trim() === 'high') {
     msgColor = classes.Severe;
     statusMessage = "Severe";
   }
