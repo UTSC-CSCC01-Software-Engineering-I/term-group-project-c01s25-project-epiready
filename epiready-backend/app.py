@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from config.database import init_db, db
 import os
 from flask_migrate import Migrate
+import models
 
 load_dotenv()
 
