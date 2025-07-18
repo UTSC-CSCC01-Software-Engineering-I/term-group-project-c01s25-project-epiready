@@ -34,7 +34,7 @@ export default function ShowShipments() {
     const fetchShipments = (newPage = page) => {
         setIsLoading(true);
         setError(null);
-        fetch(`${process.env.VITE_BACKEND_URL}/api/shipments?page=${newPage}`, {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments?page=${newPage}`, {
             method: "GET",
             headers: {
                 'Authorization': sessionStorage.getItem("token"),

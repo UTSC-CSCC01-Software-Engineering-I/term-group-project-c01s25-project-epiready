@@ -39,7 +39,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
     const destination = form.destination.value;
     const time = form.hours.value;
 
-    fetch(`${process.env.VITE_BACKEND_URL}/api/shipments`,
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments`,
         {
             method: "POST",
             body: JSON.stringify({

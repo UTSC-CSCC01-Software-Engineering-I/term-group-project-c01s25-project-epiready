@@ -17,7 +17,7 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
     const { loggedIn } = useGlobal();
     const socket = useSocket();
     const deleteLog = (id)  => {
-        fetch(`${process.env.VITE_BACKEND_URL}/api/alerts/${id}/active`, {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alerts/${id}/active`, {
             method: "PATCH",
             headers: {
                 'Authorization': sessionStorage.getItem("token"),
@@ -56,7 +56,7 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
 
     const fetchLogs = () => {
         setIsLoading(true);
-        fetch(`${process.env.VITE_BACKEND_URL}/api/alerts?active=true&page=${page}`, {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alerts?active=true&page=${page}`, {
             method: "GET",
             headers: {
                 'Authorization': sessionStorage.getItem("token"),

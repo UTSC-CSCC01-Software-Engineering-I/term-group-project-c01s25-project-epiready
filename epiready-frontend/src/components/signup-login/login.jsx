@@ -25,7 +25,7 @@ export default function LoginPopup({ trigger }) {
     const email = form.email.value;
     const password = form.password.value;
 
-    fetch(`${process.env.VITE_BACKEND_URL}/api/auth/login`,
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
         {
             method: "POST",
             body: JSON.stringify({

@@ -18,7 +18,7 @@ export const SocketProvider = ({ children }) => {
       setSocket(null);
       return;
     }
-    const newSocket = io(`${process.env.VITE_BACKEND_URL}/`, {
+    const newSocket = io(`${import.meta.env.VITE_BACKEND_URL}/`, {
       auth: { token }
     });
     setSocket(newSocket);

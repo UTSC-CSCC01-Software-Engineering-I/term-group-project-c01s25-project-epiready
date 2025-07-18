@@ -29,7 +29,7 @@ export default function SignupPopup({ trigger }) {
     const email = form.email.value;
     const password = form.password.value;
 
-    fetch(`${process.env.VITE_BACKEND_URL}/api/auth/signup`, {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`, {
       method: "POST",
       body: JSON.stringify({
         email: email,
