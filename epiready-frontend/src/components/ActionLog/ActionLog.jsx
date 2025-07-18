@@ -1,4 +1,5 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
+// eslint-disable-next-line
 import { motion } from "framer-motion";
 import classes from "./ActionLog.module.css";
 
@@ -8,13 +9,13 @@ export default function ActionLog({ type, onDestroy, id, msg, isHome = false }) 
   let msgColor = classes.Notice;
   let statusMessage = "Notice";
 
-  if (type === 1) {
+  if (type.trim() === 'very high') {
     msgColor = classes.Critical;
     statusMessage = "Critical";
-  } else if (type === 2) {
+  } else if (type.trim() === 'medium') {
     msgColor = classes.Warning;
     statusMessage = "Warning";
-  } else if (type === 3) {
+  } else if (type.trim() === 'high') {
     msgColor = classes.Severe;
     statusMessage = "Severe";
   }
@@ -38,7 +39,13 @@ export default function ActionLog({ type, onDestroy, id, msg, isHome = false }) 
       <div className={classes.cardHeader}>
         <div className={classes.msgType}>{statusMessage}</div>
         <div className={classes.date}>6/7/2025</div>
-        <div className={classes.deleteBtn} onClick={() => setIsFlipped(true)}></div>
+        <div
+          className={classes.deleteBtn}
+          onClick={() => setIsFlipped(true)}
+          aria-label="Delete"
+          role="button"
+          tabIndex={0}
+        ></div>
       </div>
       <div className={classes.cardContent}>
         <div className={classes.message}>{msg}</div>

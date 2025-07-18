@@ -54,5 +54,8 @@ class Shipment(db.Model):
 
 @event.listens_for(Shipment, 'before_update')
 def validate_completed_shipment(target):
-    if target.status == 'completed' and not target.actual_arrival:
-        target.actual_arrival = datetime.now(timezone.utc) 
+    if isinstance(target, Shipment):
+        if target.status == 'completed' and not target.actual_arrival:
+            target.actual_arrival = datetime.now(timezone.utc)
+        elif target.status == 'cancelled' and not target.actual_arrival:
+            target.actual_arrival = datetime.now(timezone.utc)
