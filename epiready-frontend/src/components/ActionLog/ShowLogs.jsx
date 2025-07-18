@@ -31,10 +31,8 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
     }
 
     useEffect(() => {
-        console.log("Socket initialized:", socket);
         if (!socket) return;
-            socket.on("breach_alert", (data) => {
-            console.log("Breach alert received:", data);
+        socket.on("breach_alert", (data) => {
             setLogs((prevLogs) => [data, ...prevLogs]);
         });
         return () => {
@@ -106,23 +104,25 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
           </div>
         )}
         {!isLoading && logComponent}
-        {loggedIn &&<div className="flex justify-center items-center gap-4 mt-6">
-          <button
-            className="px-4 py-2 bg-[#6B805E] text-white rounded shadow disabled:opacity-50"
-            onClick={() => setPage(page - 1)}
-            disabled={page <= 1}
-          >
-            Previous
-          </button>
-          <span className="font-semibold text-[#9fce8f]">Page {page} of {totalPages}</span>
-          <button
-            className="px-4 py-2 bg-[#6B805E] text-white rounded shadow disabled:opacity-50"
-            onClick={() => setPage(page + 1)}
-            disabled={page >= totalPages}
-          >
-            Next
-          </button>
-        </div>}
+        {loggedIn && !isHome && (
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <button
+              className="px-4 py-2 bg-[#6B805E] text-white rounded shadow disabled:opacity-50"
+              onClick={() => setPage(page - 1)}
+              disabled={page <= 1}
+            >
+              Previous
+            </button>
+            <span className="font-semibold text-[#9fce8f]">Page {page} of {totalPages}</span>
+            <button
+              className="px-4 py-2 bg-[#6B805E] text-white rounded shadow disabled:opacity-50"
+              onClick={() => setPage(page + 1)}
+              disabled={page >= totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     )
 }
