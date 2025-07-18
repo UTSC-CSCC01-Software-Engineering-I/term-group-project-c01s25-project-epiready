@@ -1,4 +1,4 @@
-/* global process */
+
 import { useEffect, useState } from "react";
 import ShipmentCard from "./ShipmentCard";
 import styles from "./AddShipment.module.css";

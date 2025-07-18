@@ -1,4 +1,4 @@
-/* global process */
+
 import { useEffect, useState } from "react";
 import ActionLog from "./ActionLog";
 import { useSocket } from '../../Socket';

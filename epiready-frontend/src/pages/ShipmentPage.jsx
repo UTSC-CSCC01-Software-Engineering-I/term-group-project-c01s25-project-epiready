@@ -1,4 +1,4 @@
-/* global process */
+
 import { useParams } from 'react-router-dom';
 import { useState, useEffect} from 'react';
 import Navbar from '../components/Navbar';

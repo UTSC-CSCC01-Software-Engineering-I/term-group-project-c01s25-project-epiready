@@ -51,7 +51,7 @@ def severity_rank(severity):
 
 previous_alerts = {}
 
-def start_temperature_monitor(socketio, app):
+def start_temperature_monitor(socketio, app, mail):
     with app.app_context():
         emails_sent = 0
         max_emails = 2
@@ -97,33 +97,7 @@ def start_temperature_monitor(socketio, app):
                         breach_type = "Humidity"
 
                 # Create alert in database if there's a breach and send email
-                if breach:
-                    
-                    if emails_sent < max_emails:
-                        emails_sent += 1
-                        
-                        user = User.query.get(shipment.user_id)
-                        user_email = user.email
-                        
-                        subject = f"Breach Alert: Shipment '{shipment.name}'"
-                        body = f"A {breach_type} breach has occurred in your shipment."
-                        
-                        message = Message(
-                            subject=subject,
-                            sender=app.config['MAIL_USERNAME'],
-                            recipients=[user_email],
-                            body=body
-                        )
-                        
-                        print("sending message ", shipment.name, " with email ", user_email, "total sent", emails_sent)
-                        try:
-                            mail.send(message)
-                        except Exception as e:
-                            print(f"Invalid email to {user_email} error: {str(e)}")
-                            
-                    else:
-                        print("skipping breach email", emails_sent)
-                        
+                if breach:                      
                     
                     severity = "low"
                     
@@ -165,6 +139,32 @@ def start_temperature_monitor(socketio, app):
                         should_emit = True
 
                     if should_emit:
+
+                        if emails_sent < max_emails:
+                            emails_sent += 1
+                            
+                            user = User.query.get(shipment.user_id)
+                            user_email = user.email
+                            
+                            subject = f"Breach Alert: Shipment '{shipment.name}'"
+                            body = f"A {breach_type} breach has occurred in your shipment."
+                            
+                            message = Message(
+                                subject=subject,
+                                sender=app.config['MAIL_USERNAME'],
+                                recipients=[user_email],
+                                body=body
+                            )
+                            
+                            print("sending message ", shipment.name, " with email ", user_email, "total sent", emails_sent)
+                            try:
+                                mail.send(message)
+                            except Exception as e:
+                                print(f"Invalid email to {user_email} error: {str(e)}")    
+                        else:
+                            print("skipping breach email", emails_sent)
+
+
                         alert_obj = create_alert(shipment.id, breach_type.lower().replace("+", "_and_"), severity, alert_message)
                         print(f"Creating alert for shipment {shipment.id}: {alert_message} (severity: {severity}), previous: {prev} ")
                         socketio.emit(
