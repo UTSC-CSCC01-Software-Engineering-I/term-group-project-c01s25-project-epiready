@@ -31,7 +31,7 @@ FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Expose port 80 to the outside world
-EXPOSE 5173
+EXPOSE 80
 
 # Nginx will start automatically when the container starts
 CMD ["nginx", "-g", "daemon off;"]

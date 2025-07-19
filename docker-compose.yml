@@ -41,7 +41,7 @@ services:
     container_name: frontend
     restart: always
     expose:
-      - 5173
+      - 80
     environment:
       - VIRTUAL_HOST=epiready.duckdns.org
       - LETSENCRYPT_HOST=epiready.duckdns.org
