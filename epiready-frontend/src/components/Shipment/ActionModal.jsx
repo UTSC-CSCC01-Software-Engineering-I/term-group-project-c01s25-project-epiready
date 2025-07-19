@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 
 export default function ActionModal({
   open,
@@ -14,17 +16,39 @@ export default function ActionModal({
   const handleSubmit = () => {
     if (actionInput.trim()) {
       setLocalError("");
-      onSubmit(actionInput.trim(), () => setActionInput(""));
+      onSubmit({description: actionInput.trim(), action_type: actionType.trim()}, () => {
+        setActionInput("");
+        setActionType("");
+      });
     } else {
       setLocalError("Action cannot be empty");
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-      <div className="bg-neutral-800 rounded-xl shadow-2xl p-8 w-full max-w-md flex flex-col">
+    <Popup open={open} onClose={onClose} modal closeOnDocumentClick contentStyle={{
+      background: "transparent",
+      boxShadow: "none",
+      padding: 0,
+      border: "none",
+      width: "95vw",
+      maxWidth: "400px",
+      minWidth: "0"
+    }} overlayStyle={{ background: "rgba(0,0,0,0.5)" }}>
+      <div className="relative bg-neutral-800 rounded-xl shadow-2xl p-8 w-full max-w-md flex flex-col">
+        <button
+          className="absolute top-0 right-1 text-gray-600 text-4xl font-bold hover:text-blue-900 transition"
+          onClick={() => {
+            setActionInput("");
+            setActionType("");
+            setLocalError("");
+            onClose();
+          }}
+          aria-label="Close"
+          disabled={loading}
+        >
+          &times;
+        </button>
         <h2 className="text-2xl font-bold text-[#bfc9d1] mb-4 text-center">Add Action</h2>
         <textarea
           className="w-full rounded p-2 bg-neutral-900 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-green-700 mb-4"
@@ -35,7 +59,7 @@ export default function ActionModal({
           disabled={loading}
         />
         <input
-        type="text"
+          type="text"
           className="w-full rounded p-2 bg-neutral-900 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-green-700 mb-4"
           value={actionType}
           onChange={e => setActionType(e.target.value)}
@@ -57,6 +81,7 @@ export default function ActionModal({
             className="px-4 py-2 rounded bg-neutral-700 text-white font-semibold hover:bg-neutral-600 focus:bg-neutral-600 transition"
             onClick={() => {
               setActionInput("");
+              setActionType("");
               setLocalError("");
               onClose();
             }}
@@ -66,6 +91,6 @@ export default function ActionModal({
           </button>
         </div>
       </div>
-    </div>
+    </Popup>
   );
 }

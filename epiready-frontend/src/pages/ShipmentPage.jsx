@@ -71,13 +71,13 @@ export default function ShipmentPage() {
   const createActionLog = (action, cb) => {
     setActionError("");
     setActionLoading(true);
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/actions`, {
       method: 'POST',
       headers: {
         'Authorization': sessionStorage.getItem('token'),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ action })
+      body: JSON.stringify({ shipment_id: shipmentDetails.id, action_type: action.action_type, description: action.description })
     })
       .then((response) => {
         if (!response.ok) throw new Error("Failed to add action");

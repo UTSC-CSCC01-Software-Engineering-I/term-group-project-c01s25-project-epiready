@@ -1,4 +1,4 @@
-name: backend-lint
+name: Backend Lint and Test
 
 on:
   push:
