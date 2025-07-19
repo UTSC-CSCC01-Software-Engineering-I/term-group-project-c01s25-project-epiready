@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
@@ -67,6 +68,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
         let data = {};
         try {
           data = await res.json();
+          // eslint-disable-next-line
         } catch (e) {
           setMessage(`Error ${res.status}: Something unexpected happened. Please try again later`);
           setAddError(true);
@@ -79,7 +81,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
         }
         return data;
     })
-    .then((res) => {
+    .then(() => {
         setMessage(null);
         setIsSuccess(true);
         setIsLoading(false);
@@ -240,12 +242,19 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
                       />
                       <span className="text-gray-500">°C</span>
                   </div>
-                  <input
-                   className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                   placeholder="Mode Of Transport"
-                   name="mode"
-                   required
-                   ></input>
+                  <select
+                    name="mode"
+                    className="border border-gray-300 bg-black rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    defaultValue=""
+                    required
+                  >
+                    <option value="" disabled>
+                      Mode Of Transport
+                    </option>
+                    <option value="ship">Ship</option>
+                    <option value="truck">Truck</option>
+                    <option value="plane">Plane</option>
+                  </select>
 
                   <button
                     type="submit"

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
+// eslint-disable-next-line
 import { motion } from "framer-motion";
 import classes from "./ActionLog.module.css";
 
@@ -38,7 +39,13 @@ export default function ActionLog({ type, onDestroy, id, msg, isHome = false }) 
       <div className={classes.cardHeader}>
         <div className={classes.msgType}>{statusMessage}</div>
         <div className={classes.date}>6/7/2025</div>
-        <div className={classes.deleteBtn} onClick={() => setIsFlipped(true)}></div>
+        <div
+          className={classes.deleteBtn}
+          onClick={() => setIsFlipped(true)}
+          aria-label="Delete"
+          role="button"
+          tabIndex={0}
+        ></div>
       </div>
       <div className={classes.cardContent}>
         <div className={classes.message}>{msg}</div>

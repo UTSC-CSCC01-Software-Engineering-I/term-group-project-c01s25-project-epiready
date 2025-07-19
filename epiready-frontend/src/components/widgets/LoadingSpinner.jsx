@@ -1,5 +1,6 @@
 export const LoadingSpinner = () => (
     <svg
+      role="status"
       className="animate-spin h-16 w-16 text-white w-full"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

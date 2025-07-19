@@ -1,10 +1,13 @@
+from models.weather import WeatherData
 import random
 from datetime import datetime, timezone
 from flask import request, jsonify
 from models.shipment import Shipment
+from models.user import User
 from models.alert import Alert, ActionLog
 from config.database import db
 from auth.auth import token_required
+from flask_mail import Message, Mail
 import eventlet
 
 def parse_temp_range(temp_range):
@@ -22,6 +25,24 @@ def humidity_threshold(level):
         'medium': 60,
         'high': 40
     }.get(level.lower(), 100) 
+
+def create_weather_data(location, temperature, humidity=None, aqi=None, timestamp=None):
+    """Create and save a WeatherData record to the database."""
+    try:
+        weather = WeatherData(
+            location=location,
+            temperature=temperature,
+            humidity=humidity,
+            aqi=aqi,
+            timestamp=timestamp or datetime.now(timezone.utc)
+        )
+        db.session.add(weather)
+        db.session.commit()
+        return weather
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating weather data: {e}")
+        return None
 
 def create_alert(shipment_id, alert_type, severity, message):
     """Create and save an alert to the database"""
@@ -42,28 +63,26 @@ def create_alert(shipment_id, alert_type, severity, message):
         print(f"Error creating alert: {e}")
         return None
 
+
 def severity_rank(severity):
     ranks = {"low": 1, "medium": 2, "high": 3, "very high": 4}
     return ranks.get(severity, 0)
 
 previous_alerts = {}
 
-def start_temperature_monitor(socketio, app):
+def start_temperature_monitor(socketio, app, mail):
     with app.app_context():
-        print("Starting")
+        emails_sent = 0
+        max_emails = 2
 
         while True:
             internal_temp = round(random.uniform(2, 10), 2)
             external_temp = round(random.uniform(0, 35), 2)
             humidity = round(random.uniform(10, 85), 2)
             timestamp = datetime.now(timezone.utc).isoformat()
-            
-            print("query")
 
             shipments = Shipment.query.filter_by(status='active').all()
             
-            print(shipments)
-
             for shipment in shipments:
                 lat, lon = (None, None)
                 if shipment.current_location:
@@ -83,7 +102,7 @@ def start_temperature_monitor(socketio, app):
                 if low_temp is not None and high_temp is not None:
                     if not (low_temp <= internal_temp <= high_temp):
                         breach = True
-                        breach_type = "Temperature"
+                        breach_type = "Temp"
                         alert_messages.append(f"Temperature breach: {internal_temp}°C (required: {low_temp}°C - {high_temp}°C)")
 
                 if humidity > humidity_limit:
@@ -92,16 +111,17 @@ def start_temperature_monitor(socketio, app):
                     alert_messages.append(humidity_msg)
                     
                     if breach_type:
-                        breach_type = "Humidity and Temperature"
+                        breach_type = "Temp+Humidity"
                     else:
                         breach_type = "Humidity"
 
-                # Create alert in database if there's a breach
-                if breach:
+                # Create alert in database if there's a breach and send email
+                if breach:                      
+                    
                     severity = "low"
                     
                     temp_deviation = 0
-                    if "Temperature" in breach_type:
+                    if "Temp" in breach_type:
                         temp_deviation = max(
                             abs(internal_temp - low_temp) if internal_temp < low_temp else 0,
                             abs(internal_temp - high_temp) if internal_temp > high_temp else 0
@@ -111,7 +131,7 @@ def start_temperature_monitor(socketio, app):
                     if "Humidity" in breach_type:
                         humidity_excess = humidity - humidity_limit
                     
-                    if "Temperature" in breach_type:
+                    if "Temp" in breach_type:
                         if temp_deviation > 4:
                             severity = "very high"
                         elif temp_deviation > 2:
@@ -138,7 +158,33 @@ def start_temperature_monitor(socketio, app):
                         should_emit = True
 
                     if should_emit:
-                        alert_obj = create_alert(shipment.id, breach_type.lower().replace(" ", "_"), severity, alert_message)
+
+                        if emails_sent < max_emails:
+                            emails_sent += 1
+                            
+                            user = User.query.get(shipment.user_id)
+                            user_email = user.email
+                            
+                            subject = f"Breach Alert: Shipment '{shipment.name}'"
+                            body = f"A {breach_type} breach has occurred in your shipment."
+                            
+                            message = Message(
+                                subject=subject,
+                                sender=app.config['MAIL_USERNAME'],
+                                recipients=[user_email],
+                                body=body
+                            )
+                            
+                            print("sending message ", shipment.name, " with email ", user_email, "total sent", emails_sent)
+                            try:
+                                mail.send(message)
+                            except Exception as e:
+                                print(f"Invalid email to {user_email} error: {str(e)}")    
+                        else:
+                            print("skipping breach email", emails_sent)
+
+
+                        alert_obj = create_alert(shipment.id, breach_type.lower().replace("+", "_and_"), severity, alert_message)
                         print(f"Creating alert for shipment {shipment.id}: {alert_message} (severity: {severity}), previous: {prev} ")
                         socketio.emit(
                             'breach_alert',
@@ -169,11 +215,12 @@ def start_temperature_monitor(socketio, app):
                     'breach': breach,
                     'breach_type': breach_type
                 }
+                create_weather_data(shipment.id, internal_temp, humidity, None, timestamp)
                 socketio.emit('temperature_alert', data, room=str(shipment.user_id))
                 
                 # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
 
-            eventlet.sleep(10)
+            eventlet.sleep(1000)
 
 @token_required
 def get_alerts_for_user(user_id):
@@ -304,6 +351,10 @@ def update_alert_status(user_id, alert_id):
         
         old_status = alert.status
         alert.status = status
+
+        # Set resolved_at if status is resolved
+        if status == 'resolved' and not alert.resolved_at:
+            alert.resolved_at = datetime.now(timezone.utc)
         
         # Create an action log when status changes
         if old_status != status:

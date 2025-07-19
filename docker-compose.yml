@@ -1,54 +1,112 @@
-services: # Start with this tag. This will contain all the containers you want to run
-  postgres: # For each container, define the block name. Can be anything, but should match the name of the container
-    container_name: postgres # Name of the container
-    image: postgres:latest # If you want to use published Docker image, then use this tag to specify
-    restart: always # Restart the container if it stops
-    environment: # Environment variables to be passed to the container
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: epidb
-    ports: # Ports to be exposed to the host machine
-        - "5432:5432"
-  
-  frontend:
-    build: # Build the image from the Dockerfile
-      context: ./epiready-frontend # Path to the Dockerfile
-      dockerfile: Dockerfile  # Name of the Dockerfile
-      args:
-        VITE_MAPS_KEY: ${VITE_MAPS_KEY}
-        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
-    container_name: epiready-frontend
-    image: epiready-frontend:latest # Name of the image
-    ports:
-      - '80:80' # Nginx runs on port 80 by default
-    restart: always
+version: "3.7"
 
-  redis:
-    container_name: redis
-    image: redis:latest
-    restart: always
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
     ports:
-      - '6379:6379'
-
-  backend:
-    build:
-      context: ./epiready-backend
-      dockerfile: Dockerfile
-    container_name: epiready-backend
-    image: epiready-backend:latest # Name of the image
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - ./acme:/etc/acme.sh
     environment:
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=epidb
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/epidb
-      - FRONTEND_ORIGINS=${FRONTEND_ORIGINS}
-      - SECRET_KEY=${SECRET_KEY}
-      - CORS_ORIGIN=${CORS_ORIGIN}
+      - DEFAULT_EMAIL=shubham.garg@mail.utoronto.ca
+  backend:
+    image: ghcr.io/utsc-cscc09-programming-on-the-web/shubhmgrg-webgallery
+    container_name: backend
+    restart: always
     expose:
       - 5000
-    restart: always
-    depends_on:
-      - postgres
+    env_file:
+      - ./epiready-backend/.env
+    environment:
+      - VIRTUAL_HOST=api.epiready.duckdns.org
+      - LETSENCRYPT_HOST=api.epiready.duckdns.org
 
+  frontend:
+    image: ghcr.io/utsc-cscc09-programming-on-the-web/shubhmgrg-webgallery
+    container_name: frontend
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - VIRTUAL_HOST=epiready.duckdns.org
+      - LETSENCRYPT_HOST=epiready.duckdns.org
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  volumes:
+    postgres_data:
+  
+
+# version: '3.8'
+
+# services:
+#   frontend:
+#     image: ghcr.io/utsc-cscc09-programming-on-the-web/frontend-taggit
+#     container_name: frontend
+#     env_file: ./frontend/.env.local
+#     expose:
+#       - "3000"
+#     restart: always
+#   backend:
+#     image: ghcr.io/utsc-cscc09-programming-on-the-web/backend-taggit
+#     container_name: backend
+#     env_file: ./backend/.env
+#     ports:
+#       - "4242:4242"
+#     depends_on:
+#       - postgres
+#     restart: always
+
+#   nginx:
+#     image: staticfloat/nginx-certbot
+#     container_name: nginx
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./nginx/conf.d:/etc/nginx/user.conf.d:ro
+#       - ./nginx/certbot:/etc/letsencrypt
+#     environment:
+#       - CERTBOT_EMAIL=shubham.garg@mail.utoronto.ca
+#       - CERTBOT_DOMAINS=taggit.tech,api.taggit.tech
+#       - CERTBOT_EXTRA_ARGS=--agree-tos
+#     depends_on:
+#       - frontend
+#       - backend
+#       - peerjs
+#     restart: always
+
+#   postgres:
+#     image: postgres:15-alpine
+#     container_name: postgres
+#     environment:
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#       POSTGRES_DB: ${POSTGRES_DB}
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres_data:

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
@@ -10,6 +11,7 @@ export default function LoginPopup({ trigger }) {
     const [message, setMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    // eslint-disable-next-line
     const {loggedIn, setLoggedIn} = useGlobal();
 
   const handleLogin = (e, close) => {
@@ -36,11 +38,10 @@ export default function LoginPopup({ trigger }) {
         }
     )
     .then(async (res) => {
-      console.log("Login response status: " + res.status);
-      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(data.error || "Something unexpected happened. Please try again later");
       }
+      const data = await res.json().catch(() => ({}));
       return data;
     })
     .then((res) => {

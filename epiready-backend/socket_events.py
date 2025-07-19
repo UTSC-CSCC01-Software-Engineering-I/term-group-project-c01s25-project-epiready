@@ -1,8 +1,12 @@
 from controllers.alerts import start_temperature_monitor
 from flask_socketio import join_room
 import jwt
+import os
 
-def register_socketio_events(socketio, app):
+def register_socketio_events(socketio, app, mail):
+    
+    if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
+        return
     
     @socketio.on('connect')
     def handle_connect(auth):
@@ -11,7 +15,7 @@ def register_socketio_events(socketio, app):
         if not token:
             print("No token provided on socket connection.")
             return False
-
+ 
         try:
             data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
             user_id = data['user_id']
@@ -25,4 +29,4 @@ def register_socketio_events(socketio, app):
             print("Invalid token")
             return False
         
-    socketio.start_background_task(start_temperature_monitor, socketio, app)
+    socketio.start_background_task(start_temperature_monitor, socketio, app, mail)
