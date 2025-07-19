@@ -1,7 +1,10 @@
 from flask import request, jsonify, current_app
 import jwt
-from models.user import create_user, verify_user
+from models.user import create_user, verify_user, User
 from datetime import datetime, timedelta, timezone
+from auth.auth import token_required
+from config.database import db
+import bcrypt
 
 def generate_token(user_id: int) -> str:
     payload = {
@@ -74,3 +77,41 @@ def login():
         return jsonify({"message": "Login successful!", "token": token, "user_id": user.id}), 200
     
     return jsonify({"error": "Wrong username/password"}), 401
+
+@token_required
+def change_password(user_id):
+    """
+    POST /auth/change-password
+
+    Allows an authenticated user to change their password.
+
+    Request Body:
+    {
+        "old_password": "oldpass",
+        "new_password": "newpass"
+    }
+
+    Authentication: Bearer token in Authorization header
+
+    Possible Error Responses:
+    - 400 Bad Request: "Both old_password and new_password are required."
+    - 401 Unauthorized: "Old password is incorrect."
+    - 404 Not Found: "User not found."
+    """
+    data = request.get_json()
+    old_password = data.get("old_password")
+    new_password = data.get("new_password")
+
+    if not old_password or not new_password:
+        return jsonify({"error": "Both old_password and new_password are required."}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found."}), 404
+
+    if not bcrypt.checkpw(old_password.encode(), user.password_hash.encode()):
+        return jsonify({"error": "Old password is incorrect."}), 401
+
+    user.password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+    db.session.commit()
+    return jsonify({"message": "Password changed successfully!"}), 200
