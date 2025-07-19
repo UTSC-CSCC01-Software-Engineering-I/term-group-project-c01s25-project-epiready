@@ -22,9 +22,10 @@ services:
       - ./html:/usr/share/nginx/html
       - ./acme:/etc/acme.sh
     environment:
-      - DEFAULT_EMAIL=shubham.garg@mail.utoronto.ca
+      - DEFAULT_EMAIL=gargshubham2005@gmail.com
+      - NGINX_PROXY_CONTAINER=nginx-proxy
   backend:
-    image: ghcr.io/utsc-cscc09-programming-on-the-web/shubhmgrg-webgallery
+    image: epireadydev/epiready-backend:latest
     container_name: backend
     restart: always
     expose:
@@ -32,15 +33,15 @@ services:
     env_file:
       - ./epiready-backend/.env
     environment:
-      - VIRTUAL_HOST=api.epiready.duckdns.org
-      - LETSENCRYPT_HOST=api.epiready.duckdns.org
+      - VIRTUAL_HOST=api-epiready.duckdns.org
+      - LETSENCRYPT_HOST=api-epiready.duckdns.org
 
   frontend:
-    image: ghcr.io/utsc-cscc09-programming-on-the-web/shubhmgrg-webgallery
+    image: epireadydev/epiready-frontend:latest
     container_name: frontend
     restart: always
     expose:
-      - 3000
+      - 5173
     environment:
       - VIRTUAL_HOST=epiready.duckdns.org
       - LETSENCRYPT_HOST=epiready.duckdns.org
