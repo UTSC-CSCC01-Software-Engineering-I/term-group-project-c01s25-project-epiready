@@ -86,13 +86,23 @@ def get_shipments_by_user(user_id):
 
     Get all shipments related to the user.
 
+    Query Parameters:
+    - page: Page number for pagination (optional, default is 1)
+
     Possible Error Responses:
     - 401 Unauthorized: "Session token was invalid."
     """
-    
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 15
     try:
-        shipments = Shipment.query.filter_by(user_id=user_id).all()
-        return jsonify([shipment.to_dict() for shipment in shipments]), 200
+        base_query = Shipment.query.filter_by(user_id=user_id)
+        total_count = base_query.count()
+        shipments = base_query.order_by(Shipment.created_at.desc()).offset((page - 1) * per_page).limit(per_page).all()
+        return jsonify({
+            'shipments': [shipment.to_dict() for shipment in shipments],
+            'total_count': total_count
+        }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
