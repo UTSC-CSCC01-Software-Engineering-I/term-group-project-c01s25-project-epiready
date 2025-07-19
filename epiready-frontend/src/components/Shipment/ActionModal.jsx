@@ -19,7 +19,7 @@ const ActionModal = ({ isOpen, onClose, onSubmit, loading, error }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <div className="bg-neutral-700 rounded-lg shadow-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">Add Shipment Action</h2>
         <form onSubmit={handleSubmit}>
           <textarea

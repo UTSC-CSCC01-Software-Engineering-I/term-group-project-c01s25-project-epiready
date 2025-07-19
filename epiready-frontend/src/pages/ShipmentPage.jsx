@@ -21,6 +21,8 @@ export default function ShipmentPage() {
   const [showActionModal, setShowActionModal] = useState(false);
   const [actionError, setActionError] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [actionHistory, setActionHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const { loggedIn } = useGlobal();
   const socket = useSocket();
 
@@ -68,29 +70,79 @@ export default function ShipmentPage() {
       });
   };
 
+  const fetchActionHistory = () => {
+    if (!shipmentDetails) return;
+    
+    console.log("Fetching action history for shipment:", shipmentDetails.id);
+    setHistoryLoading(true);
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
+      method: 'GET',
+      headers: {
+        'Authorization': sessionStorage.getItem('token'),
+        'Content-Type': 'application/json'
+      }
+    })
+      .then((response) => {
+        console.log("History fetch response status:", response.status);
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Action history received:", data);
+        if (Array.isArray(data)) {
+          setActionHistory(data);
+        } else {
+          console.error('Unexpected response format:', data);
+          setActionHistory([]);
+        }
+        setHistoryLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching action history:', error);
+        setActionHistory([]);
+        setHistoryLoading(false);
+      });
+  };
+
   const createActionLog = (action, cb) => {
+    console.log("Creating action log with:", action);
+    console.log("Shipment details:", shipmentDetails);
+    
     setActionError("");
     setActionLoading(true);
+    
+    // Prepare the data in the format the backend expects
+    const actionData = {
+      action_type: "user_action",  // Default action type
+      description: action,         // The action text from the modal
+      status: "active"            // Default status
+    };
+
+    console.log("Sending action data:", actionData);
+
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
       method: 'POST',
       headers: {
         'Authorization': sessionStorage.getItem('token'),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ action })
+      body: JSON.stringify(actionData)
     })
       .then((response) => {
+        console.log("Response status:", response.status);
         if (!response.ok) throw new Error("Failed to add action");
         return response.json();
       })
-      .then(() => {
+      .then((data) => {
+        console.log("Action created successfully:", data);
         setShowActionModal(false);
         setActionError("");
         setActionLoading(false);
+        fetchActionHistory(); // Refresh action history
         if (cb) cb();
         // Optionally refresh logs or show a toast
       })
       .catch((error) => {
+        console.error("Error creating action:", error);
         setActionError(error.message);
         setActionLoading(false);
       });
@@ -102,6 +154,12 @@ export default function ShipmentPage() {
     fetchShipmentDetails();
   }, [name]);
 
+  useEffect(() => {
+    if (shipmentDetails && tab === 'history') {
+      fetchActionHistory();
+    }
+  }, [shipmentDetails, tab]);
+
   
   const shipmentInfo = (info) => (
     <div className="w-full bg-neutral-900 rounded-xl p-6 shadow-lg">
@@ -109,7 +167,7 @@ export default function ShipmentPage() {
         {info.name}
       </h1>
       <ActionModal
-        open={showActionModal}
+        isOpen={showActionModal}
         onClose={() => { setShowActionModal(false); setActionError(""); }}
         onSubmit={createActionLog}
         loading={actionLoading}
@@ -177,6 +235,72 @@ export default function ShipmentPage() {
           Set Shipment Status
         </button>
       </div>
+    </div>
+  );
+
+  const historyComponent = () => (
+    <div className="w-full bg-neutral-900 rounded-xl p-6 shadow-lg">
+      <h2 className="text-3xl font-bold mb-6 text-center text-[#bfc9d1] tracking-wide">
+        Action History
+      </h2>
+      
+      {historyLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-[#d1d5db] text-xl">Loading action history...</div>
+        </div>
+      ) : actionHistory.length === 0 ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-[#d1d5db] text-xl">No actions recorded yet.</div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {actionHistory.map((action) => (
+            <div 
+              key={action.id} 
+              className="bg-neutral-800 rounded-lg p-4 border-l-4 border-[#869F77]"
+            >
+              <div className="flex flex-wrap justify-between items-start mb-2">
+                <div className="flex flex-col">
+                  <h3 className="text-lg font-semibold text-[#bfc9d1] capitalize">
+                    {action.action_type.replace(/_/g, ' ')}
+                  </h3>
+                  <p className="text-[#d1d5db] text-sm">
+                    {action.description}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end text-sm text-[#9ca3af]">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    action.status === 'completed' 
+                      ? 'bg-green-600 text-white' 
+                      : action.status === 'in_progress'
+                      ? 'bg-yellow-600 text-white'
+                      : 'bg-blue-600 text-white'
+                  }`}>
+                    {action.status}
+                  </span>
+                  <span className="mt-1">
+                    {new Date(action.created_at).toLocaleString()}
+                  </span>
+                  {action.completed_at && (
+                    <span className="text-xs">
+                      Completed: {new Date(action.completed_at).toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              {action.action_metadata && (
+                <div className="mt-3 p-3 bg-neutral-700 rounded text-sm">
+                  <h4 className="text-[#bfc9d1] font-medium mb-1">Additional Details:</h4>
+                  <pre className="text-[#d1d5db] whitespace-pre-wrap">
+                    {JSON.stringify(action.action_metadata, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
@@ -254,6 +378,14 @@ export default function ShipmentPage() {
                 googleMapsApiKey={googleMapsApiKey} 
               />
             </div>
+          </div>
+        )}
+        {tab === 'history' && (
+          historyComponent()
+        )}
+        {tab === 'graphs' && (
+          <div className="w-full flex justify-center items-center">
+            <div className="text-white text-xl">Graphs feature coming soon...</div>
           </div>
         )}
       </div>
