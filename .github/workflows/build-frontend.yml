@@ -1,0 +1,54 @@
+name: Publish Project Frontend to GHCR
+
+on:
+  push:
+    # Only run this workflow if it is a commit to main.
+    branches:
+      - main
+      - ci-cd
+    tags:
+      - 'v*'
+    # Only run this workflow if the commit has modified files from frontend
+    paths:
+      - epiready-frontend/**
+
+env:
+  IMAGE_NAME: epiready-frontend
+
+jobs:
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: epiready-frontend
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Build image
+        run: |
+          docker build . --file Dockerfile --tag $IMAGE_NAME \
+            --build-arg VITE_BACKEND_URL="${{ secrets.VITE_BACKEND_URL }}" \
+            --build-arg VITE_MAPS_KEY="${{ secrets.VITE_MAPS_KEY }}"
+            
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Push to Docker Hub
+        run: |
+          docker tag epiready-frontend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
+          docker tag epiready-frontend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:${{ env.VERSION }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:${{ env.VERSION }}
+          docker images
