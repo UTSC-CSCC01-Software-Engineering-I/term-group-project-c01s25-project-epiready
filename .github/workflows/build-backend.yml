@@ -1,4 +1,4 @@
-name: Publish Project Frontend to GHCR
+name: Publish Project Backend to Dockerhub
 
 on:
   push:
@@ -40,8 +40,8 @@ jobs:
       
       - name: Push to Docker Hub
         run: |
-          docker tag epiready-frontend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
-          docker tag epiready-frontend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:${{ env.VERSION }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/epiready-frontend:${{ env.VERSION }}
+          docker tag epiready-backend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
+          docker tag epiready-backend:latest ${{ secrets.DOCKER_USERNAME }}/epiready-backend:${{ env.VERSION }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/epiready-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/epiready-backend:${{ env.VERSION }}
           docker images

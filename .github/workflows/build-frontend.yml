@@ -1,4 +1,4 @@
-name: Publish Project Frontend to GHCR
+name: Publish Project Frontend to Dockerhub
 
 on:
   push:

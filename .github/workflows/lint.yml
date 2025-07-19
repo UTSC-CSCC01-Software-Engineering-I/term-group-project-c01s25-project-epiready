@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'epiready-frontend/**'
+  pull_request:
+    paths:
+      - 'epiready-backend/**'
 
 jobs:
   test-and-lint:

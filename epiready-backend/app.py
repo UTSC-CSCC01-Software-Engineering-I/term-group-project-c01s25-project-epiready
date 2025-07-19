@@ -42,7 +42,7 @@ def create_app():
 
     register_socketio_events(socketio, app, mail)
     return app
-
+ 
 app = create_app()
 
 @app.route("/health", methods=["GET"])
