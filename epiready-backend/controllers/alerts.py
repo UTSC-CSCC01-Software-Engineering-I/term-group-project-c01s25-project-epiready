@@ -1,3 +1,4 @@
+from models.weather import WeatherData
 import random
 from datetime import datetime, timezone
 from flask import request, jsonify
@@ -24,6 +25,24 @@ def humidity_threshold(level):
         'medium': 60,
         'high': 40
     }.get(level.lower(), 100) 
+
+def create_weather_data(location, temperature, humidity=None, aqi=None, timestamp=None):
+    """Create and save a WeatherData record to the database."""
+    try:
+        weather = WeatherData(
+            location=location,
+            temperature=temperature,
+            humidity=humidity,
+            aqi=aqi,
+            timestamp=timestamp or datetime.now(timezone.utc)
+        )
+        db.session.add(weather)
+        db.session.commit()
+        return weather
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating weather data: {e}")
+        return None
 
 def create_alert(shipment_id, alert_type, severity, message):
     """Create and save an alert to the database"""
@@ -196,11 +215,12 @@ def start_temperature_monitor(socketio, app, mail):
                     'breach': breach,
                     'breach_type': breach_type
                 }
+                create_weather_data(shipment.id, internal_temp, humidity, None, timestamp)
                 socketio.emit('temperature_alert', data, room=str(shipment.user_id))
                 
                 # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
 
-            eventlet.sleep(10)
+            eventlet.sleep(1000)
 
 @token_required
 def get_alerts_for_user(user_id):
@@ -331,6 +351,10 @@ def update_alert_status(user_id, alert_id):
         
         old_status = alert.status
         alert.status = status
+
+        # Set resolved_at if status is resolved
+        if status == 'resolved' and not alert.resolved_at:
+            alert.resolved_at = datetime.now(timezone.utc)
         
         # Create an action log when status changes
         if old_status != status:

@@ -48,13 +48,7 @@ export default function SignupPopup({ trigger }) {
           setMessage("An error occurred while processing your request. Please try again.");
         }
         if (!res.ok || data.error) {
-          setSignupError(true);
-          setMessage(
-            data.error || "Something unexpected happened. Please try again later"
-          );
-          // Clear fields on error
-          form.email.value = "";
-          form.password.value = "";
+          throw new Error(data.error || "Something unexpected happened. Please try again later");
         }
         return data;
       })
@@ -69,88 +63,80 @@ export default function SignupPopup({ trigger }) {
       })
       .finally(() => {
         setIsLoading(false);
-      });
+      }).catch((error) => {
+      setSignupError(true);
+      setIsLoading(false);
+      let errorMsg = error.message || "An error occurred during signup. Please try again.";
+      if( error.message.includes("Failed to fetch") || error.message.includes("NetworkError") ) {
+        errorMsg = "Network error. Please check your internet connection and try again.";
+      }
+      setMessage(errorMsg);
+      form.email.value = '';
+      form.password.value = '';
+    });
   };
 
   return (
     <Popup
       trigger={trigger}
       modal
-      onClose={cleanup}
       closeOnDocumentClick
       contentStyle={{
         background: "transparent",
         boxShadow: "none",
         padding: 0,
         border: "none",
-        width: "95vw", // Always 95vw
-        maxWidth: "400px", // But never more than 400px
-        minWidth: "0",
+        width: "95vw",
+        maxWidth: "400px",
+        minWidth: "0"
       }}
       overlayStyle={{ background: "rgba(0,0,0,0.5)" }}
+      onClose={cleanup}
     >
-      {(close) => (
-        <div className="relative bg-black max-w-[90vw] md:max-w-[400px] w-full rounded-lg p-8 mx-auto flex flex-col items-center shadow-lg min-h-[280px]">
-          {isSuccess ? (
-            <div className="flex flex-col items-center justify-center flex-grow">
-              <SuccessTick />
-              <p className="text-[#9fce8f] mt-4">{message}</p>
-            </div>
-          ) : (
-            <>
-              <button
-                className="absolute top-0 right-1 text-gray-600 text-4xl font-bold hover:text-blue-900 transition"
-                onClick={close}
-                aria-label="Close"
-              >
-                &times;
-              </button>
-              <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">
-                Sign Up
-              </h2>
-              {isLoading ? (
-                <div className="flex items-center justify-center flex-grow">
-                  <LoadingSpinner />
-                </div>
-              ) : (
-                <form
-                  onSubmit={(e) => handleSignup(e, close)}
-                  className="w-full flex flex-col gap-4"
-                >
+      {close => (
+        <div className="relative bg-black max-w-[90vw] sm:w-[500px] w-full rounded-lg p-6 mx-auto flex flex-col items-center shadow-lg min-h-[270px]">
+          <button
+            className="absolute top-0 right-1 text-gray-600 text-4xl font-bold hover:text-blue-900 transition"
+            onClick={() => { close(); cleanup(); }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+          <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">Sign Up</h2>
+          <div className="flex flex-col items-center w-full flex-1 justify-center min-h-[100px]">
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : isSuccess ? (
+              <>
+                <SuccessTick />
+                <div className="text-green-400 text-center font-semibold mb-2">{message}</div>
+              </>
+            ) : (
+              <>
+                <form onSubmit={e => handleSignup(e, close)} className="w-full flex flex-col gap-4">
                   <input
                     type="email"
-                    placeholder="Email"
                     name="email"
+                    placeholder="Email"
                     className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    disabled={isLoading}
                   />
                   <input
                     type="password"
                     name="password"
                     placeholder="Password"
                     className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    disabled={isLoading}
                   />
                   <button
                     type="submit"
-                    className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition disabled:bg-gray-400"
-                    disabled={isLoading}
+                    className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition"
                   >
                     Sign Up
                   </button>
                 </form>
-              )}
-              {message && !isSuccess && (
-                <div
-                  className={`mt-4 text-center ${
-                    signupError ? "text-red-500" : "text-white"
-                  }`}
-                >
-                  {message}
-                </div>
-              )}
-            </>
-          )}
+                {signupError && <div className="text-red-400 text-center font-semibold mt-2">{message}</div>}
+              </>
+            )}
+          </div>
         </div>
       )}
     </Popup>

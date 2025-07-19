@@ -65,10 +65,19 @@ describe('ShowLogs', () => {
     expect(await screen.findByTestId('action-log')).toHaveTextContent('Alert 2');
   });
 
-  it('shows pagination controls when logged in', async () => {
+  it('shows pagination controls when logged in and isHome is false', async () => {
     render(<ShowLogs />);
     expect(await screen.findByText(/Page 1 of/)).toBeInTheDocument();
     expect(screen.getByText('Next')).toBeInTheDocument();
     expect(screen.getByText('Previous')).toBeInTheDocument();
+  });
+
+  it('does not show pagination controls when isHome is true', async () => {
+    render(<ShowLogs isHome={true} />);
+    // Wait for logs to render
+    expect(await screen.findByTestId('action-log')).toBeInTheDocument();
+    expect(screen.queryByText(/Page 1 of/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Next')).not.toBeInTheDocument();
+    expect(screen.queryByText('Previous')).not.toBeInTheDocument();
   });
 });
