@@ -23,7 +23,7 @@ export function GlobalProvider({ children }) {
     </LoggedIn.Provider>
   );
 }
-
+ 
 export function useGlobal() {
   return useContext(LoggedIn);
 }

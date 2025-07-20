@@ -1,11 +1,7 @@
-name: backend-lint
+name: Backend Lint and Test
 
 on:
   push:
-    branches:
-      - feat/ci-cd
-      - develop
-      - main
     paths:
       - 'epiready-backend/**'
   pull_request:

@@ -17,5 +17,5 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Run the application using Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+# Run the application using Gunicorn with eventlet worker for WebSocket support
+CMD ["gunicorn", "-k", "eventlet", "-b", "0.0.0.0:5000", "app:app"]

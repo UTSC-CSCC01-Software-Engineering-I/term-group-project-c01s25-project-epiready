@@ -22,7 +22,7 @@ export const SocketProvider = ({ children }) => {
       auth: { token }
     });
     setSocket(newSocket);
-
+ 
     return () => {
       newSocket.disconnect();
       setSocket(null);

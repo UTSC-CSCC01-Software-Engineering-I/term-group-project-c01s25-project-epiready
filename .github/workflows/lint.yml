@@ -1,9 +1,12 @@
-name: Run Frontend Server
+name: Frontend Lint and Test
 
 on:
   push:
     paths:
       - 'epiready-frontend/**'
+  pull_request:
+    paths:
+      - 'epiready-backend/**'
 
 jobs:
   test-and-lint:

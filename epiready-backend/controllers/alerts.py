@@ -26,12 +26,15 @@ def humidity_threshold(level):
         'high': 40
     }.get(level.lower(), 100) 
 
-def create_weather_data(location, temperature, humidity=None, aqi=None, timestamp=None):
+def create_weather_data(user_id, shipment_id, location, internal_temp, external_temp, humidity, aqi=None, timestamp=None):
     """Create and save a WeatherData record to the database."""
     try:
         weather = WeatherData(
+            user_id=user_id,
+            shipment_id=shipment_id,
             location=location,
-            temperature=temperature,
+            internal_temp=internal_temp,
+            external_temp=external_temp,
             humidity=humidity,
             aqi=aqi,
             timestamp=timestamp or datetime.now(timezone.utc)
@@ -215,12 +218,12 @@ def start_temperature_monitor(socketio, app, mail):
                     'breach': breach,
                     'breach_type': breach_type
                 }
-                create_weather_data(shipment.id, internal_temp, humidity, None, timestamp)
+                create_weather_data(shipment.user_id, shipment.id, internal_temp, external_temp, humidity, None, timestamp)
                 socketio.emit('temperature_alert', data, room=str(shipment.user_id))
                 
                 # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
 
-            eventlet.sleep(1000)
+            eventlet.sleep(30)
 
 @token_required
 def get_alerts_for_user(user_id):
@@ -259,6 +262,9 @@ def get_alerts_for_user(user_id):
             base_query = Alert.query.filter_by(shipment_id=shipment_id)
         else:
             base_query = Alert.query.filter(Alert.shipment_id.in_(shipment_ids))
+
+        if active_filter:
+            base_query = base_query.filter(Alert.active == active_filter)
 
         # Get total count before pagination
         total_count = base_query.count()

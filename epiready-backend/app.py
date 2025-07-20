@@ -43,7 +43,7 @@ def create_app():
 
     register_socketio_events(socketio, app, mail)
     return app
-
+ 
 app = create_app()
 
 @app.route("/health", methods=["GET"])
@@ -51,6 +51,12 @@ def health_check():
     print("CORS_ORIGIN:", os.getenv("CORS_ORIGIN"))
 
     return jsonify(status="Healthy"), 200
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'none';"
+    return response
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
