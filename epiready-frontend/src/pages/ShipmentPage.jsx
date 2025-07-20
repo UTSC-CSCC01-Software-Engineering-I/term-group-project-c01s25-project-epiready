@@ -109,23 +109,13 @@ export default function ShipmentPage() {
     
     setActionError("");
     setActionLoading(true);
-    
-    // Prepare the data in the format the backend expects
-    const actionData = {
-      action_type: "user_action",  // Default action type
-      description: action,         // The action text from the modal
-      status: "active"            // Default status
-    };
-
-    console.log("Sending action data:", actionData);
-
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/actions`, {
       method: 'POST',
       headers: {
         'Authorization': sessionStorage.getItem('token'),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(actionData)
+      body: JSON.stringify({ shipment_id: shipmentDetails.id, action_type: action.action_type, description: action.description })
     })
       .then((response) => {
         console.log("Response status:", response.status);

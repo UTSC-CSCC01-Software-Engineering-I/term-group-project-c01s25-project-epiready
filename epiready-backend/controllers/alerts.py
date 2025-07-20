@@ -260,6 +260,9 @@ def get_alerts_for_user(user_id):
         else:
             base_query = Alert.query.filter(Alert.shipment_id.in_(shipment_ids))
 
+        if active_filter:
+            base_query = base_query.filter(Alert.active == active_filter)
+
         # Get total count before pagination
         total_count = base_query.count()
 

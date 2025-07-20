@@ -15,7 +15,7 @@ def register_socketio_events(socketio, app, mail):
         if not token:
             print("No token provided on socket connection.")
             return False
-
+ 
         try:
             data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
             user_id = data['user_id']
