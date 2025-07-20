@@ -63,9 +63,4 @@ class ActionLog(db.Model):
             'details': self.details,
             'created_at': self.created_at.isoformat(),
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
-        }
-
-@event.listens_for(ActionLog, 'before_update')
-def validate_completed_action(target):
-    if target.status == 'completed' and not target.completed_at:
-        target.completed_at = datetime.now(timezone.utc) 
+        } 

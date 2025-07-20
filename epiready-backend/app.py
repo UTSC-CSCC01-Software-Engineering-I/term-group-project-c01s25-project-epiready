@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from config.database import init_db, db
 import os
 from flask_migrate import Migrate
+import models
 
 load_dotenv()
 
@@ -21,7 +22,7 @@ def create_app():
 
     print("CORS_ORIGIN:", os.getenv("CORS_ORIGIN"))
 
-    CORS(app, origins=os.getenv("CORS_ORIGIN"), supports_credentials=True)
+    CORS(app, origins=[os.getenv("CORS_ORIGIN")], supports_credentials=True)
     init_db(app)
     
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')

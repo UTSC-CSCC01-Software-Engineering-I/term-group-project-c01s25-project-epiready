@@ -38,10 +38,10 @@ export default function LoginPopup({ trigger }) {
         }
     )
     .then(async (res) => {
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(data.error || "Something unexpected happened. Please try again later");
       }
-      const data = await res.json().catch(() => ({}));
       return data;
     })
     .then((res) => {

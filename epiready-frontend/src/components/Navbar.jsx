@@ -29,6 +29,15 @@ export default function Navbar({ currentPage }) {
         <NavbarLink to="/alerts" currentPage={currentPage}>
           Alerts
         </NavbarLink>
+        <NavbarLink to="/track" currentPage={currentPage}>
+          Track
+        </NavbarLink>
+        <NavbarLink to="/monitor" currentPage={currentPage}>
+          Monitor
+        </NavbarLink>
+        <NavbarLink to="/organization" currentPage={currentPage}>
+          Organization
+        </NavbarLink>
         {loggedIn ? (
           <button
             className="hover:bg-red-600 hover:text-black"
