@@ -16,6 +16,8 @@ def _q(obj):
         def filter(self, *a, **k):   return self
         def filter_by(self, **k):     return self
         def order_by(self, *a, **k):  return self
+        def limit(self, *a, **k):     return self
+        def offset(self, *a, **k):    return self
         def all(self):   return [obj] if obj else []
         def first(self): return obj
         def get(self, _): return obj
@@ -96,9 +98,13 @@ def test_get_alerts_empty(monkeypatch, client):
 
 def test_get_alerts_success(monkeypatch, client):
     import models.shipment as ship_m, models.alert as alert_m, controllers.alerts as a_ctrl
-    class S: id = 1; user_id = 1
+    class S:
+        id = 1
+        user_id = 1
+        name = "Test Shipment"
     class Al:
-        def to_dict(self): return {"id":1,"shipment_id":1,"type":"temp","status":"active"}
+        shipment_id = 1
+        def to_dict(self): return {"id":1,"shipment_id":1,"type":"temp","status":"active", "active": "true"}
     for mod in (ship_m, a_ctrl):
         monkeypatch.setattr(mod.Shipment, "query", _q(S()), raising=False)
     for mod in (alert_m, a_ctrl):

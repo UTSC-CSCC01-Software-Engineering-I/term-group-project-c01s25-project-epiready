@@ -194,8 +194,10 @@ def get_weather_data(user_id, shipment_id):
                 'timestamp': w_dict.get('timestamp')
             }
             humidity_data.append(humidity_entry)
-        return jsonify({'all': weather_data, 'humidity': humidity_data, 'temperature': temp_data}), 200
+        return jsonify({'all': [w.to_dict() for w in weather_data], 'humidity': humidity_data, 'temperature': temp_data}), 200
     except Exception as e:
+        import traceback
+        print("[get_weather_data] Exception:", traceback.format_exc())
         return jsonify({'error': str(e)}), 500
     
 @token_required

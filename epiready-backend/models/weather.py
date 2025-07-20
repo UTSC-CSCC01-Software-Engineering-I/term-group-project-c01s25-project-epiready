@@ -5,7 +5,7 @@ class WeatherData(db.Model):
     __tablename__ = 'weather_data'
 
     id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(100), nullable=True)
     internal_temp = db.Column(db.Float, nullable=True)
     external_temp = db.Column(db.Float, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Optional link to User

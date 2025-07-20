@@ -41,7 +41,7 @@ def create_weather_data(user_id, shipment_id, location, internal_temp, external_
         )
         db.session.add(weather)
         db.session.commit()
-        return weather
+        return weather.to_dict()
     except Exception as e:
         db.session.rollback()
         print(f"Error creating weather data: {e}")
@@ -218,7 +218,7 @@ def start_temperature_monitor(socketio, app, mail):
                     'breach': breach,
                     'breach_type': breach_type
                 }
-                create_weather_data(shipment.user_id, shipment.id, internal_temp, external_temp, humidity, None, timestamp)
+                create_weather_data(shipment.user_id, shipment.id, str(lat) + " " + str(lon), internal_temp, external_temp, humidity, None, timestamp)
                 socketio.emit('temperature_alert', data, room=str(shipment.user_id))
                 
                 # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
@@ -290,6 +290,7 @@ def get_alerts_for_user(user_id):
             'total_count': total_count
         }), 200
     except Exception as e:
+        import traceback; traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @token_required

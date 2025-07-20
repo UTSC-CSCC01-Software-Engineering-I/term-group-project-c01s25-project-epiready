@@ -120,7 +120,7 @@ def test_create_action_success(monkeypatch, client):
 def test_get_actions_shipment_not_found(monkeypatch, client):
     import models.shipment as ship_m
     monkeypatch.setattr(ship_m.Shipment, "query", _q(None), raising=False)
-    r = client.get("/actions", json={"shipment_id": "s1"})
+    r = client.get("/actions?shipment_id=s1")
     assert r.status_code == 404
 
 
@@ -133,7 +133,7 @@ def test_get_actions_success(monkeypatch, client):
     monkeypatch.setattr(ship_m.Shipment,       "query", _q(S()), raising=False)
     monkeypatch.setattr(user_m.User,           "query", _q(U()), raising=False)
     monkeypatch.setattr(act_m.ShipmentAction,  "query", _q(A()), raising=False)
-    r = client.get("/actions", json={"shipment_id": "s1"})
+    r = client.get("/actions?shipment_id=s1")
     assert r.status_code == 200 and b"status_update" in r.data
 
 

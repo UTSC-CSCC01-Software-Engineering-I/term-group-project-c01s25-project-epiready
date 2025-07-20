@@ -51,20 +51,24 @@ export default function ShipmentPage() {
 
 
 useEffect(() => {
-  if (weatherData && weatherData.all) {
-    const tempData = weatherData.all.map((entry) => ({
-      time: entry.temperature.timestamp,
-      internal: entry.temperature.internal,
-      external: entry.temperature.external,
-      minRange: shipmentDetails?.min_temp,
-      maxRange: shipmentDetails?.max_temp,
-    }));
+  if (weatherData && weatherData.temperature) {
+    const tempData = weatherData.temperature.map((entry) => {
+      return {
+        time: entry.timestamp,
+        internal: entry.internal,
+        external: entry.external,
+        minRange: shipmentDetails?.min_temp,
+        maxRange: shipmentDetails?.max_temp,
+      };
+    });
     setTemperatureData(tempData);
 
-    const humidityDataArr = weatherData.all.map((entry) => ({
-      time: entry.humidity.timestamp,
-      humidity: entry.humidity.humidity,
-    }));
+    const humidityDataArr = weatherData.humidity.map((entry) => {
+      return {
+        time: entry.timestamp,
+        humidity: entry.humidity,
+      };
+    });
     setHumidityData(humidityDataArr);
   }
 }, [weatherData]);
@@ -96,7 +100,7 @@ useEffect(() => {
   if (liveData && weatherData && weatherData.all) {
     // Format the new liveData to match the backend format
     const tempEntry = {
-      internal: liveData.internal_temperature ?? liveData.temperature,
+      internal: liveData.internal_temperature,
       external: liveData.external_temperature,
       timestamp: liveData.timestamp,
     };
@@ -116,6 +120,8 @@ useEffect(() => {
       return {
         ...prevWeatherData,
         all: [...prevWeatherData.all, newWeatherEntry],
+        temperature: [...prevWeatherData.temperature, tempEntry],
+        humidity: [...prevWeatherData.humidity, humidityEntry],
       };
     });
   }
@@ -128,7 +134,7 @@ useEffect(() => {
         lat: prev.lat + 0.001,
         lng: prev.lng + 0.001
       }));
-    }, 100000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -398,7 +404,7 @@ useEffect(() => {
   );
 
   const content = (
-    <div className="bg-[#1D1D1D] min-h-screen flex flex-col items-center">
+    <div className="bg-[#1D1D1D] min-h-screen flex flex-col items-center overflow-x-hidden">
       <Navbar currentPage="/" />
       <div className="w-screen flex justify-center items-center mt-0 min-h-16 h-16 border-b-1 border-neutral-600 drop-shadow-xl drop-shadow-neutral-700/40 overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-600">
         <div className="w-9/10 sm:w-4/5 h-full flex gap-4 items-center">

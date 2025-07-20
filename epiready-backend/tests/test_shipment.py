@@ -84,7 +84,50 @@ def test_create_shipment_success(monkeypatch, client):
     assert r.status_code == 201 and b"Box" in r.data
 
 
+# ──────────────── get_weather_data tests
+def test_get_weather_not_found(monkeypatch, client):
+    import controllers.shipment as ship_ctrl
+    import models.user as user_m, models.shipment as ship_m, models.weather as weather_m
+    class U:
+        id = 1
+        role = "manufacturer"
+    monkeypatch.setattr(user_m.User, "query", _q(U()), raising=False)
+    monkeypatch.setattr(ship_m.Shipment, "query", _q(None), raising=False)
+    # Simulate token_required by passing user_id=1
+    with client.application.test_request_context():
+        r = ship_ctrl.get_weather_data(shipment_id="s1")
+        assert r[1] == 404 and b"Shipment not found" in r[0].data
+
+
+    class U:
+        id = 1
+        role = "manufacturer"
+    class S:
+        id = "s1"
+        user_id = 2  # Not equal to injected user_id=1
+    class W:
+        def to_dict(self): return {}
+    monkeypatch.setattr(user_m.User, "query", _q(U()), raising=False)
+    monkeypatch.setattr(ship_m.Shipment, "query", _q(S()), raising=False)
+    monkeypatch.setattr(weather_m.WeatherData, "query", _q(W()), raising=False)
+    with client.application.test_request_context():
+        r = ship_ctrl.get_weather_data(shipment_id="s1")
+        assert r[1] == 403 and b"Access denied" in r[0].data
+
 def test_get_shipment_by_name_not_found(monkeypatch, client):
+    import controllers.shipment as ship_ctrl
+    import models.user as user_m, models.shipment as ship_m, models.weather as weather_m
+    class U: id = 1; role = "manufacturer"
+    class S: id = "s1"; user_id = 1
+    class W:
+        def to_dict(self):
+            return {"internal_temperature": 5, "external_temperature": 10, "humidity": 50, "timestamp": "2024-01-01T00:00:00"}
+    monkeypatch.setattr(user_m.User, "query", _q(U()), raising=False)
+    monkeypatch.setattr(ship_m.Shipment, "query", _q(S()), raising=False)
+    monkeypatch.setattr(weather_m.WeatherData, "query", _q(W()), raising=False)
+    with client.application.test_request_context():
+        r = ship_ctrl.get_weather_data(shipment_id="s1")
+        assert r[1] == 200 and b"internal" in r[0].data and b"humidity" in r[0].data
     import models.user as user_m, models.shipment as ship_m
     class U: role="manufacturer"
     monkeypatch.setattr(user_m.User, "query", _q(U()), raising=False)

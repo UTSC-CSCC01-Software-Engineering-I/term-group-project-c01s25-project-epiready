@@ -100,7 +100,7 @@ export default function ShowShipments() {
             </div>)}
         </div>
 
-        {loggedIn && (<div className="flex justify-center items-center gap-4 mt-6">
+        {loggedIn && (<div className="flex justify-center items-center gap-4 mt-6 mb-8">
             <button
                 className="px-4 py-2 bg-[#6B805E] text-white rounded shadow disabled:opacity-50"
                 onClick={() => setPage(page - 1)}
