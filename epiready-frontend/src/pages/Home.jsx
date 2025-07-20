@@ -16,7 +16,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-radial-[at_50%_100%] from-[#5C6C52] to-[#0C0C0C] to-90% min-h-screen flex flex-col items-center">
+    <div className="bg-radial-[at_50%_100%] from-[#5C6C52] to-[#0C0C0C] to-90% min-h-screen flex flex-col items-center overflow-x-hidden">
       <Navbar currentPage="/" />
       <div
         className={`mt-16 mb-10 min-h-32 w-32 bg-[url('/src/assets/syringe.png')] bg-contain bg-no-repeat bg-center transition-all duration-900 ease-out ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
