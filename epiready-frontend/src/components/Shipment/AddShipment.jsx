@@ -64,7 +64,7 @@ export default function AddShipmentPopup({ trigger, setAdded }) {
         }
     )
     .then(async (res) => {
-        console.log("Add Shipment response status: " + res.status);
+        
         let data = {};
         try {
           data = await res.json();

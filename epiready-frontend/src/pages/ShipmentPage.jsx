@@ -1,6 +1,6 @@
 
 import { useParams } from 'react-router-dom';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   LineChart, 
   AreaChart, 
@@ -31,6 +31,7 @@ export default function ShipmentPage() {
   const [tab, setTab] = useState('info');
   const [shipmentDetails, setShipmentDetails] = useState(null);
   const [liveData, setLiveData] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
   const [position, setPosition] = useState({ lat: 43.6800, lng: -79.4000 });
   // eslint-disable-next-line
   const [origin, setOrigin] = useState({ lat: 43.6532, lng: -79.3832 });
@@ -41,54 +42,84 @@ export default function ShipmentPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionHistory, setActionHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [temperatureData, setTemperatureData] = useState([]);
+  const [humidityData, setHumidityData] = useState([]);
   const { loggedIn } = useGlobal();
   const socket = useSocket();
 
   const googleMapsApiKey = import.meta.env.VITE_MAPS_KEY;
-  
-  // Mock data for various charts
-  const temperatureData = [
-    { time: '00:00', internal: 2.1, external: 15.2, minRange: 2.0, maxRange: 3.0 },
-    { time: '04:00', internal: 2.3, external: 12.8, minRange: 2.0, maxRange: 3.0 },
-    { time: '08:00', internal: 2.8, external: 18.5, minRange: 2.0, maxRange: 3.0 },
-    { time: '12:00', internal: 3.2, external: 22.1, minRange: 2.0, maxRange: 3.0 },
-    { time: '16:00', internal: 2.9, external: 20.3, minRange: 2.0, maxRange: 3.0 },
-    { time: '20:00', internal: 2.4, external: 16.7, minRange: 2.0, maxRange: 3.0 },
-    { time: '24:00', internal: 2.2, external: 14.1, minRange: 2.0, maxRange: 3.0 },
-  ];
 
-  const humidityData = [
-    { time: '00:00', humidity: 45 },
-    { time: '04:00', humidity: 47 },
-    { time: '08:00', humidity: 52 },
-    { time: '12:00', humidity: 58 },
-    { time: '16:00', humidity: 55 },
-    { time: '20:00', humidity: 49 },
-    { time: '24:00', humidity: 46 },
-  ];
 
-  const alertsData = [
-    { name: 'Temperature', value: 2, color: '#ef4444' },
-    { name: 'Humidity', value: 1, color: '#f59e0b' },
-    { name: 'Location', value: 0, color: '#10b981' },
-    { name: 'System', value: 1, color: '#8b5cf6' },
-  ];
+useEffect(() => {
+  if (weatherData && weatherData.all) {
+    const tempData = weatherData.all.map((entry) => ({
+      time: entry.temperature.timestamp,
+      internal: entry.temperature.internal,
+      external: entry.temperature.external,
+      minRange: shipmentDetails?.min_temp,
+      maxRange: shipmentDetails?.max_temp,
+    }));
+    setTemperatureData(tempData);
 
-  const riskAssessmentData = [
-    { factor: 'Temperature', current: 75, max: 100 },
-    { factor: 'Humidity', current: 60, max: 100 },
-    { factor: 'Transit Time', current: 40, max: 100 },
-    { factor: 'Route Safety', current: 85, max: 100 },
-    { factor: 'Weather', current: 30, max: 100 },
-  ];
+    const humidityDataArr = weatherData.all.map((entry) => ({
+      time: entry.humidity.timestamp,
+      humidity: entry.humidity.humidity,
+    }));
+    setHumidityData(humidityDataArr);
+  }
+}, [weatherData]);
 
-  const deliveryTimelineData = [
-    { milestone: 'Pickup', planned: 100, actual: 100, status: 'completed' },
-    { milestone: 'Transit Hub 1', planned: 100, actual: 100, status: 'completed' },
-    { milestone: 'Transit Hub 2', planned: 100, actual: 85, status: 'current' },
-    { milestone: 'Final Hub', planned: 100, actual: 0, status: 'pending' },
-    { milestone: 'Delivery', planned: 100, actual: 0, status: 'pending' },
-  ];
+  // const alertsData = [
+  //   { name: 'Temperature', value: 2, color: '#ef4444' },
+  //   { name: 'Humidity', value: 1, color: '#f59e0b' },
+  //   { name: 'Location', value: 0, color: '#10b981' },
+  //   { name: 'System', value: 1, color: '#8b5cf6' },
+  // ];
+
+  // const riskAssessmentData = [
+  //   { factor: 'Temperature', current: 75, max: 100 },
+  //   { factor: 'Humidity', current: 60, max: 100 },
+  //   { factor: 'Transit Time', current: 40, max: 100 },
+  //   { factor: 'Route Safety', current: 85, max: 100 },
+  //   { factor: 'Weather', current: 30, max: 100 },
+  // ];
+
+  // const deliveryTimelineData = [
+  //   { milestone: 'Pickup', planned: 100, actual: 100, status: 'completed' },
+  //   { milestone: 'Transit Hub 1', planned: 100, actual: 100, status: 'completed' },
+  //   { milestone: 'Transit Hub 2', planned: 100, actual: 85, status: 'current' },
+  //   { milestone: 'Final Hub', planned: 100, actual: 0, status: 'pending' },
+  //   { milestone: 'Delivery', planned: 100, actual: 0, status: 'pending' },
+  // ];
+
+useEffect(() => {
+  if (liveData && weatherData && weatherData.all) {
+    // Format the new liveData to match the backend format
+    const tempEntry = {
+      internal: liveData.internal_temperature ?? liveData.temperature,
+      external: liveData.external_temperature,
+      timestamp: liveData.timestamp,
+    };
+    const humidityEntry = {
+      humidity: liveData.humidity,
+      timestamp: liveData.timestamp,
+    };
+    const newWeatherEntry = {
+      temperature: tempEntry,
+      humidity: humidityEntry,
+      aqi: liveData.aqi,
+      location: liveData.location,
+      id: liveData.id,
+    };
+    setWeatherData((prevWeatherData) => {
+      if (!prevWeatherData || !prevWeatherData.all) return prevWeatherData;
+      return {
+        ...prevWeatherData,
+        all: [...prevWeatherData.all, newWeatherEntry],
+      };
+    });
+  }
+}, [liveData]);
 
 
   useEffect(() => {
@@ -102,10 +133,9 @@ export default function ShipmentPage() {
   }, []);
 
   useEffect(() => {
-    console.log("Socket initialized:", socket);
     if (!socket) return;
     socket.on("temperature_alert", (data) => {
-      console.log("Temperature alert received:", data);
+
       setLiveData(data);
     });
     return () => {
@@ -125,17 +155,34 @@ export default function ShipmentPage() {
       .then((response) => response.json())
       .then((data) => {
         setShipmentDetails(data);
-        console.log("Shipment details fetched:", data);
       })
       .catch((error) => {
         console.error('Error fetching shipment details:', error);
       });
   };
 
+  useEffect(() => {
+    if(shipmentDetails){
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/weather`, {
+        method: 'GET',
+        headers: {
+          'Authorization': sessionStorage.getItem('token'),
+          'Content-Type': 'application/json'
+        }
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        setWeatherData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching weather data:", error);
+      });
+    }
+  }, [shipmentDetails]);
+
   const fetchActionHistory = () => {
     if (!shipmentDetails) return;
     
-    console.log("Fetching action history for shipment:", shipmentDetails.id);
     setHistoryLoading(true);
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/actions`, {
       method: 'GET',
@@ -145,11 +192,9 @@ export default function ShipmentPage() {
       }
     })
       .then((response) => {
-        console.log("History fetch response status:", response.status);
         return response.json();
       })
       .then((data) => {
-        console.log("Action history received:", data);
         if (Array.isArray(data)) {
           setActionHistory(data);
         } else {
@@ -166,9 +211,6 @@ export default function ShipmentPage() {
   };
 
   const createActionLog = (action, cb) => {
-    console.log("Creating action log with:", action);
-    console.log("Shipment details:", shipmentDetails);
-    
     setActionError("");
     setActionLoading(true);
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/actions`, {
@@ -185,7 +227,6 @@ export default function ShipmentPage() {
         return response.json();
       })
       .then((data) => {
-        console.log("Action created successfully:", data);
         setShowActionModal(false);
         setActionError("");
         setActionLoading(false);
@@ -538,9 +579,9 @@ export default function ShipmentPage() {
             </div>
 
             {/* Middle Row - Alerts and Risk Assessment */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> */}
               {/* Alerts Distribution */}
-              <div className="bg-neutral-900 rounded-xl p-6 shadow-lg">
+              {/* <div className="bg-neutral-900 rounded-xl p-6 shadow-lg">
                 <h3 className="text-xl font-semibold text-[#bfc9d1] mb-4 flex items-center">
                   <span className="w-3 h-3 bg-red-500 rounded-full mr-3"></span>
                   Alert Distribution
@@ -571,10 +612,10 @@ export default function ShipmentPage() {
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
-              </div>
+              </div> */}
 
               {/* Risk Assessment */}
-              <div className="bg-neutral-900 rounded-xl p-6 shadow-lg">
+              {/* <div className="bg-neutral-900 rounded-xl p-6 shadow-lg">
                 <h3 className="text-xl font-semibold text-[#bfc9d1] mb-4 flex items-center">
                   <span className="w-3 h-3 bg-purple-500 rounded-full mr-3"></span>
                   Risk Assessment
@@ -596,10 +637,10 @@ export default function ShipmentPage() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+            </div> */}
 
             {/* Bottom Row - Delivery Timeline */}
-            <div className="bg-neutral-900 rounded-xl p-6 shadow-lg">
+            {/* <div className="bg-neutral-900 rounded-xl p-6 shadow-lg">
               <h3 className="text-xl font-semibold text-[#bfc9d1] mb-4 flex items-center">
                 <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
                 Delivery Timeline Progress
@@ -632,7 +673,7 @@ export default function ShipmentPage() {
                   />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            </div> */}
 
             {/* Status Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
