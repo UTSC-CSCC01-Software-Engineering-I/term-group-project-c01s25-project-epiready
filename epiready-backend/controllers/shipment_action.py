@@ -70,7 +70,7 @@ def create_shipment_action(user_id):
 @token_required
 def get_shipment_actions(user_id):
     """
-    GET /actions
+    GET /actions?shipment_id=<shipment_id>
     
     Get all actions for a specific shipment.
     - Regular users: Can only access actions for their own shipments
@@ -82,8 +82,7 @@ def get_shipment_actions(user_id):
     - 401 Unauthorized: "Session token was invalid."
     """
     
-    data = request.get_json()
-    shipment_id = data.get("shipment_id")
+    shipment_id = request.args.get("shipment_id")
     if not shipment_id:
         return jsonify({'error': 'Shipment ID is required'}), 400
     
@@ -262,3 +261,73 @@ def get_user_action_history(auth_user_id, user_id):
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500 
+
+@token_required
+def create_shipment_action_by_id(user_id, shipment_id):
+    """
+    POST /<shipment_id>/actions
+    
+    Creates a new action for a specific shipment using shipment_id from URL.
+    """
+    
+    # Check if shipment exists and user has access
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+    
+    user = User.query.get(user_id)
+    if user.role != 'transporter_manager' and shipment.user_id != user_id:
+        return jsonify({'error': 'Access denied. You can only create actions for your own shipments.'}), 403
+    
+    data = request.get_json()
+    
+    # Allow either 'action' or 'action_type' field
+    if 'action' in data:
+        data['action_type'] = data['action']
+    
+    required_fields = ['action_type', 'description']
+    missing = [field for field in required_fields if field not in data]
+    if missing:
+        return jsonify({'error': f'Missing fields: {", ".join(missing)}'}), 400
+    
+    try:
+        action = ShipmentAction(
+            shipment_id=shipment_id,
+            user_id=user_id,
+            action_type=data['action_type'],
+            description=data['description'],
+            status=data.get('status', 'active'),
+            action_metadata=data.get('action_metadata')
+        )
+        
+        db.session.add(action)
+        db.session.commit()
+        
+        return jsonify(action.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@token_required
+def get_shipment_actions_by_id(user_id, shipment_id):
+    """
+    GET /<shipment_id>/actions
+    
+    Get all actions for a specific shipment using shipment_id from URL.
+    """
+    
+    # Check if shipment exists
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+    
+    # Check access permissions
+    user = User.query.get(user_id)
+    if user.role != 'transporter_manager' and shipment.user_id != user_id:
+        return jsonify({'error': 'Access denied. You can only view actions for your own shipments.'}), 403
+    
+    try:
+        actions = ShipmentAction.query.filter_by(shipment_id=shipment_id).order_by(ShipmentAction.created_at.desc()).all()
+        return jsonify([action.to_dict() for action in actions]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

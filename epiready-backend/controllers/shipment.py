@@ -3,6 +3,7 @@ from models.shipment import Shipment  # Assuming your model is in models/shipmen
 from models.user import User
 from config.database import db
 from datetime import datetime, timezone
+from models.weather import WeatherData
 import uuid
 from auth.auth import token_required
 import jwt
@@ -153,6 +154,72 @@ def get_shipment_by_name(user_id, name):
         if not shipment:
             return jsonify({'error': 'Shipment not found'}), 404
         return jsonify(shipment.to_dict()), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@token_required
+def get_weather_data(user_id, shipment_id):
+    """
+    GET /shipments/<shipment_id>/weather
+    Fetch weather data for a specific user and shipment.
+    - Only allows access if the shipment belongs to the user or user is transporter_manager.
+    - Returns 404 if shipment not found.
+    - Returns 403 if user does not have access.
+    - Returns all weather data under 'all', with temperature and humidity grouped as specified.
+    """
+    # Validate shipment exists
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+    # Validate user access
+    user = User.query.get(user_id)
+    if user.role != 'transporter_manager' and shipment.user_id != user_id:
+        return jsonify({'error': 'Access denied. You can only view weather data for your own shipments.'}), 403
+    try:
+        weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).all()
+        temp_data = []
+        humidity_data = []
+        for w in weather_data:
+            w_dict = w.to_dict() if hasattr(w, 'to_dict') else dict(w)
+            # Group temperature and humidity as requested
+            temp_entry = {
+                'internal': w_dict.get('internal_temperature') if 'internal_temperature' in w_dict else w_dict.get('temperature'),
+                'external': w_dict.get('external_temperature'),
+                'timestamp': w_dict.get('timestamp')
+            }
+            temp_data.append(temp_entry)
+            humidity_entry = {
+                'humidity': w_dict.get('humidity'),
+                'timestamp': w_dict.get('timestamp')
+            }
+            humidity_data.append(humidity_entry)
+        return jsonify({'all': weather_data, 'humidity': humidity_data, 'temperature': temp_data}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@token_required
+def get_latest_weather_data(user_id, shipment_id):
+    """
+    GET /shipments/<shipment_id>/weather/latest
+    Fetch the latest weather data for a specific user and shipment.
+    - Only allows access if the shipment belongs to the user or user is transporter_manager.
+    - Returns 404 if shipment not found.
+    - Returns 403 if user does not have access.
+    """
+    # Validate shipment exists
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+    # Validate user access
+    user = User.query.get(user_id)
+    if user.role != 'transporter_manager' and shipment.user_id != user_id:
+        return jsonify({'error': 'Access denied. You can only view weather data for your own shipments.'}), 403
+    try:
+        weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).order_by(WeatherData.id.desc()).first()
+        if not weather_data:
+            return jsonify({'id': '-', 'temperature': '-', 'humidity': '-', 'timestamp': '-', 'location': '-', 'aqi': '-'}), 200
+        return jsonify(weather_data.to_dict()), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
