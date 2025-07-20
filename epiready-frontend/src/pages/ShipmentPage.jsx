@@ -226,7 +226,7 @@ useEffect(() => {
         if (!response.ok) throw new Error("Failed to add action");
         return response.json();
       })
-      .then((data) => {
+      .then(() => {
         setShowActionModal(false);
         setActionError("");
         setActionLoading(false);

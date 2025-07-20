@@ -1,6 +1,9 @@
 .cardContainer {
     width: calc(min(800px, 95vw));
-    margin: 20px;
+    margin-top: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
     min-height: 7.5em;
     height: auto;
     perspective: 1000px;

@@ -86,7 +86,7 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
     const totalPages = Math.max(1, Math.ceil(totalCount / 25));
 
     return(
-      <div className="mb-10">
+      <div className="mb-2">
         {isLoading && (
           <div className="flex justify-center items-center py-8">
             <LoadingSpinner />
@@ -105,7 +105,7 @@ export default function ShowLogs({ maxAlerts = -1, isHome = false }) {
         )}
         {!isLoading && logComponent}
         {loggedIn && !isHome && (
-          <div className="flex justify-center items-center gap-4 mt-6">
+          <div className="flex justify-center items-center gap-4 mt-6 mb-8">
             <button
               className="px-4 py-2 bg-[#6B805E] text-white rounded shadow disabled:opacity-50"
               onClick={() => setPage(page - 1)}
