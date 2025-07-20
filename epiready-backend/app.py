@@ -51,5 +51,11 @@ def health_check():
 
     return jsonify(status="Healthy"), 200
 
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'none';"
+    return response
+
 if __name__ == '__main__':
     socketio.run(app, debug=True)

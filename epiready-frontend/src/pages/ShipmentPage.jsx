@@ -157,7 +157,7 @@ export default function ShipmentPage() {
         {info.name}
       </h1>
       <ActionModal
-        isOpen={showActionModal}
+        open={showActionModal}
         onClose={() => { setShowActionModal(false); setActionError(""); }}
         onSubmit={createActionLog}
         loading={actionLoading}
