@@ -15,26 +15,25 @@ To implement comprehensive alert management and action tracking capabilities for
 - **Purpose**: Detailed tracking of all actions taken on shipments and alerts
 - **Details**: ActionLog model for alert-related actions, ShipmentAction model for shipment operations, and comprehensive action history API endpoints
 
-#### 3. Manual Override Capabilities
+<!-- #### 3. Manual Override Capabilities
 - **Purpose**: Allow users to manually control alert statuses and actions
-- **Details**: Alert status override functionality, action creation and management, and user permission-based access control
+- **Details**: Alert status override functionality, action creation and management, and user permission-based access control -->
 
-#### 4. Real-time Alert Notifications
+#### 3. Real-time Alert Notifications
 - **Purpose**: Instant notification delivery through WebSocket connections
 - **Details**: Real-time breach alerts, temperature monitoring, and live status updates with socket-based communication
 
-#### 5. Organization Management System
+#### 4. Organization Management System
 - **Purpose**: Multi-tenant organization support for team collaboration
 - **Details**: Organization creation, join code system, user organization association, and organization-based access control
 
-#### 6. Shipment Analytics & Visualization
+#### 5. Shipment Analytics & Visualization
 - **Purpose**: Data visualization and historical analysis for shipment monitoring
 - **Details**: Graphs tab with temperature/humidity charts, history tab with action logs and timeline, and interactive data visualization components
 
 ### Excluded Features
-- **SMS/Text Alerts**: Limited to email notifications due to SMS service integration complexity
-- **Custom Alert Rules**: Predefined alert conditions without user-configurable rules
-
+- **SMS/Text Alerts**: Limited to email notifications due to unnecessary api costs addition
+- **Change Password**: Axed due to safety and security concerns for users
 ## Bug Fixes
 - Fixed alert status update functionality
 - Resolved action history display issues
@@ -57,10 +56,10 @@ To implement comprehensive alert management and action tracking capabilities for
 - **Authentication**: JWT token-based with role-based access
 
 ## Known Limitations
-- **Email Rate Limiting**: Maximum 2 emails per monitoring cycle to prevent spam
-- **Mock Data**: Temperature and humidity data still simulated rather than real sensor feeds
+- **Email Rate Limiting**: Maximum 2 emails per monitoring cycle to stay within free tier for email pushes
+- **Mock Data**: Temperature and humidity data still simulated rather than real sensor feeds due to missing OpenWeatherAPI
 - **Limited Email Customization**: Basic email templates without rich formatting
-- **No SMS Integration**: Text alerts not implemented due to service complexity
+- **No SMS Integration**: Text alerts not implemented due to service costs
 
 ## Participants
 - **Frontend Team**: Bo, Shubham, David
