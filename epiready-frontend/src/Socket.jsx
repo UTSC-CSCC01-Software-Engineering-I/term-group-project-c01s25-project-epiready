@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useGlobal } from "./LoggedIn";
@@ -17,7 +18,7 @@ export const SocketProvider = ({ children }) => {
       setSocket(null);
       return;
     }
-    const newSocket = io("http://localhost:5000/", {
+    const newSocket = io(`${import.meta.env.VITE_BACKEND_URL}/`, {
       auth: { token }
     });
     setSocket(newSocket);
