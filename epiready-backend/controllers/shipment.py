@@ -184,8 +184,8 @@ def get_weather_data(user_id, shipment_id):
             w_dict = w.to_dict() if hasattr(w, 'to_dict') else dict(w)
             # Group temperature and humidity as requested
             temp_entry = {
-                'internal': w_dict.get('internal_temperature') if 'internal_temperature' in w_dict else w_dict.get('temperature'),
-                'external': w_dict.get('external_temperature'),
+                'internal': w_dict.get('internal_temp') if 'internal_temp' in w_dict else w_dict.get('temperature'),
+                'external': w_dict.get('external_temp'),
                 'timestamp': w_dict.get('timestamp')
             }
             temp_data.append(temp_entry)

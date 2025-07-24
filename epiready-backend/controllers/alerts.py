@@ -223,7 +223,7 @@ def start_temperature_monitor(socketio, app, mail):
                 
                 # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
 
-            eventlet.sleep(30)
+            eventlet.sleep(10)
 
 @token_required
 def get_alerts_for_user(user_id):

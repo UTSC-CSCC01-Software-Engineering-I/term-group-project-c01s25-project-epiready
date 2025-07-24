@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 
 services:
   nginx-proxy:
@@ -22,7 +22,7 @@ services:
       - ./html:/usr/share/nginx/html
       - ./acme:/etc/acme.sh
     environment:
-      - DEFAULT_EMAIL=gargshubham2005@gmail.com
+      - DEFAULT_EMAIL=shubham.garg@mail.utoronto.ca
       - NGINX_PROXY_CONTAINER=nginx-proxy
   backend:
     image: epireadydev/epiready-backend:latest
@@ -33,8 +33,8 @@ services:
     env_file:
       - ./epiready-backend/.env
     environment:
-      - VIRTUAL_HOST=api-epiready.duckdns.org
-      - LETSENCRYPT_HOST=api-epiready.duckdns.org
+      - VIRTUAL_HOST=api.epiready.taggit.tech
+      - LETSENCRYPT_HOST=api.epiready.taggit.tech
 
   frontend:
     image: epireadydev/epiready-frontend:latest
@@ -43,9 +43,8 @@ services:
     expose:
       - 80
     environment:
-      - VIRTUAL_HOST=epiready.duckdns.org
-      - LETSENCRYPT_HOST=epiready.duckdns.org
-
+      - VIRTUAL_HOST=epiready.taggit.tech
+      - LETSENCRYPT_HOST=epiready.taggit.tech
   postgres:
     image: postgres:15-alpine
     container_name: postgres
@@ -56,48 +55,60 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  volumes:
-    postgres_data:
-  
+volumes:
+  postgres_data:
 
-# version: '3.8'
+# #####################################################
+
+
+
+# version: "3.7"
 
 # services:
-#   frontend:
-#     image: ghcr.io/utsc-cscc09-programming-on-the-web/frontend-taggit
-#     container_name: frontend
-#     env_file: ./frontend/.env.local
-#     expose:
-#       - "3000"
-#     restart: always
-#   backend:
-#     image: ghcr.io/utsc-cscc09-programming-on-the-web/backend-taggit
-#     container_name: backend
-#     env_file: ./backend/.env
-#     ports:
-#       - "4242:4242"
-#     depends_on:
-#       - postgres
-#     restart: always
-
-#   nginx:
-#     image: staticfloat/nginx-certbot
-#     container_name: nginx
+#   nginx-proxy:
+#     image: jwilder/nginx-proxy
+#     container_name: nginx-proxy
 #     ports:
 #       - "80:80"
 #       - "443:443"
 #     volumes:
-#       - ./nginx/conf.d:/etc/nginx/user.conf.d:ro
-#       - ./nginx/certbot:/etc/letsencrypt
+#       - /var/run/docker.sock:/tmp/docker.sock:ro
+#       - ./certs:/etc/nginx/certs
+#       - ./vhost:/etc/nginx/vhost.d
+#       - ./html:/usr/share/nginx/html
+#   nginx-proxy-acme:
+#     image: nginxproxy/acme-companion
+#     container_name: nginx-proxy-acme
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock:ro
+#       - ./certs:/etc/nginx/certs
+#       - ./vhost:/etc/nginx/vhost.d
+#       - ./html:/usr/share/nginx/html
+#       - ./acme:/etc/acme.sh
 #     environment:
-#       - CERTBOT_EMAIL=shubham.garg@mail.utoronto.ca
-#       - CERTBOT_DOMAINS=taggit.tech,api.taggit.tech
-#       - CERTBOT_EXTRA_ARGS=--agree-tos
-#     depends_on:
-#       - frontend
-#       - backend
-#       - peerjs
+#       - DEFAULT_EMAIL=gargshubham2005@gmail.com
+#       - NGINX_PROXY_CONTAINER=nginx-proxy
+#   backend:
+#     image: epireadydev/epiready-backend:latest
+#     container_name: backend
 #     restart: always
+#     expose:
+#       - 5000
+#     env_file:
+#       - ./epiready-backend/.env
+#     environment:
+#       - VIRTUAL_HOST=api-epiready.duckdns.org
+#       - LETSENCRYPT_HOST=api-epiready.duckdns.org
+
+#   frontend:
+#     image: epireadydev/epiready-frontend:latest
+#     container_name: frontend
+#     restart: always
+#     expose:
+#       - 80
+#     environment:
+#       - VIRTUAL_HOST=epiready.duckdns.org
+#       - LETSENCRYPT_HOST=epiready.duckdns.org
 
 #   postgres:
 #     image: postgres:15-alpine
@@ -109,5 +120,5 @@ services:
 #     volumes:
 #       - postgres_data:/var/lib/postgresql/data
 
-# volumes:
-#   postgres_data:
+#   volumes:
+#     postgres_data:
