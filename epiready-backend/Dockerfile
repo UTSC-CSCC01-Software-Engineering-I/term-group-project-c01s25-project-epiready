@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 5000
 
 # Run the application using Gunicorn with eventlet worker for WebSocket support
-CMD ["gunicorn", "-k", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:app", "--log-level", "debug", "--error-logfile", "-"]
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:app", "--log-level", "debug", "--error-logfile", "-"]
