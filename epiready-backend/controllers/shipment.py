@@ -177,7 +177,7 @@ def get_weather_data(user_id, shipment_id):
     if user.role != 'transporter_manager' and shipment.user_id != user_id:
         return jsonify({'error': 'Access denied. You can only view weather data for your own shipments.'}), 403
     try:
-        weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).all()
+        weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).order_by(WeatherData.id.desc()).limit(70).all()
         temp_data = []
         humidity_data = []
         for w in weather_data:
