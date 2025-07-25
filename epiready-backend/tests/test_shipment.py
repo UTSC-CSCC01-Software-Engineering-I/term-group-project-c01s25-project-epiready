@@ -73,15 +73,25 @@ def test_create_shipment_missing_fields(monkeypatch, client):
 
 def test_create_shipment_success(monkeypatch, client):
     import models.user as user_m, models.shipment as ship_m
-    class U: role="manufacturer"
-    monkeypatch.setattr(user_m.User, "query", _q(U()), raising=False)
+
+    class U:
+        role = "manufacturer"
+        organization_id = 1
+
+    dummy_user = U()
+
+    monkeypatch.setattr(user_m.User, "query", _q(dummy_user), raising=False)
     monkeypatch.setattr(ship_m.Shipment, "query", _q(None), raising=False)
+
     r = client.post("/shipments", json={
         'name':'Box','product_type':'A','origin':'x','destination':'y',
         'min_temp':1,'max_temp':5,'humidity_sensitivity':'low','aqi_sensitivity':'low',
-        'transit_time_hrs':1,'risk_factor':1,'mode_of_transport':'air','status':'created'
+        'transit_time_hrs':1,'risk_factor':1,'mode_of_transport':'air','status':'created',
+        "organization_id": dummy_user.organization_id
     })
+
     assert r.status_code == 201 and b"Box" in r.data
+
 
 
 # ──────────────── get_weather_data tests
@@ -117,24 +127,43 @@ def test_get_weather_not_found(monkeypatch, client):
 def test_get_shipment_by_name_not_found(monkeypatch, client):
     import controllers.shipment as ship_ctrl
     import models.user as user_m, models.shipment as ship_m, models.weather as weather_m
-    class U: id = 1; role = "manufacturer"
-    class S: id = "s1"; user_id = 1
+
+    class U:
+        id = 1
+        role = "manufacturer"
+        organization_id = 1
+
+    class S:
+        id = "s1"
+        user_id = 1
+        organization_id = 1
+
     class W:
         def to_dict(self):
-            return {"internal_temperature": 5, "external_temperature": 10, "humidity": 50, "timestamp": "2024-01-01T00:00:00"}
-    monkeypatch.setattr(user_m.User, "query", _q(U()), raising=False)
-    monkeypatch.setattr(ship_m.Shipment, "query", _q(S()), raising=False)
-    monkeypatch.setattr(weather_m.WeatherData, "query", _q(W()), raising=False)
+            return {
+                "internal_temperature": 5,
+                "external_temperature": 10,
+                "humidity": 50,
+                "timestamp": "2024-01-01T00:00:00"
+            }
+
+    dummy_user    = U()
+    dummy_ship    = S()
+    dummy_weather = W()
+
+    monkeypatch.setattr(user_m.User, "query", _q(dummy_user), raising=False)
+    monkeypatch.setattr(ship_m.Shipment, "query", _q(dummy_ship), raising=False)
+    monkeypatch.setattr(weather_m.WeatherData, "query", _q(dummy_weather), raising=False)
+
     with client.application.test_request_context():
         r = ship_ctrl.get_weather_data(shipment_id="s1")
         assert r[1] == 200 and b"internal" in r[0].data and b"humidity" in r[0].data
-    import models.user as user_m, models.shipment as ship_m
-    class U: role="manufacturer"
-    monkeypatch.setattr(user_m.User, "query", _q(U()), raising=False)
+
+    monkeypatch.setattr(user_m.User, "query", _q(dummy_user), raising=False)
     monkeypatch.setattr(ship_m.Shipment, "query", _q(None), raising=False)
+
     r = client.get("/shipments/none")
     assert r.status_code == 404
-
 
 def test_get_shipment_by_name_success(monkeypatch, client):
     import models.user as user_m, models.shipment as ship_m

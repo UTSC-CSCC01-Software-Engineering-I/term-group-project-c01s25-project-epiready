@@ -18,7 +18,7 @@ def get_user(user_id):
     - 401 Unauthorized: "Token is missing" or "Invalid token"
     """
     try:
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             return jsonify({"error": "User not found"}), 404
         return jsonify(user.to_dict()), 200
@@ -38,7 +38,7 @@ def get_users_by_role(user_id):
     """
     try:
         # Check if current user is a transporter manager
-        current_user = User.query.get(user_id)
+        current_user = db.session.get(User, user_id)
         if current_user.role != 'transporter_manager':
             return jsonify({"error": "Access denied. Only transporter managers can view users by role."}), 403
         
@@ -66,7 +66,7 @@ def get_all_users(user_id):
     """
     try:
         # Check if current user is a transporter manager
-        current_user = User.query.get(user_id)
+        current_user = db.session.get(User, user_id)
         if current_user.role != 'transporter_manager':
             return jsonify({"error": "Access denied. Only transporter managers can view all users."}), 403
         
@@ -78,6 +78,22 @@ def get_all_users(user_id):
 
 @token_required
 def create_organization(user_id):
+    """
+    POST /users/create-organization
+    
+    Creates a new organization. The current user becomes transporter_manager of the created org.
+    
+    Request Body:
+    {
+        "name": "OrgName",
+        "join_code": "CODE123"
+    }
+    
+    Possible Error Responses:
+    - 400 Bad Request: "Organization name and join code are required."
+    - 400 Bad Request: "Organization name already exists."
+    - 400 Bad Request: "Join code already exists."
+    """
     data = request.get_json()
     name = data.get('name')
     join_code = data.get('join_code')
@@ -91,7 +107,7 @@ def create_organization(user_id):
     db.session.add(org)
     db.session.commit()
     # Assign current user to the organization and set their role
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     user.organization_id = org.id
     user.role = 'transporter_manager'
     db.session.commit()
@@ -99,11 +115,26 @@ def create_organization(user_id):
 
 @token_required
 def join_organization(user_id):
+    """
+    POST /users/join-organization
+    
+    Join an existing organization by join_code.
+    
+    Request Body:
+    {
+        "join_code": "CODE123"
+    }
+    
+    Possible Error Responses:
+    - 400 Bad Request: "Join code is required."
+    - 400 Bad Request: "User already belongs to an organization."
+    - 404 Not Found: "Invalid join code."
+    """
     data = request.get_json()
     join_code = data.get('join_code')
     if not join_code:
         return jsonify({'error': 'Join code is required.'}), 400
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if hasattr(user, 'organization_id') and user.organization_id:
         return jsonify({'error': 'User already belongs to an organization.'}), 400
     org = Organization.query.filter_by(join_code=join_code).first()
@@ -115,11 +146,25 @@ def join_organization(user_id):
 
 @token_required
 def get_organization_by_id(user_id):
+    """
+    GET /users/organization
+    
+    Get organization details by id (in JSON body).
+    
+    Request Body:
+    {
+        "id": 123
+    }
+    
+    Possible Error Responses:
+    - 400 Bad Request: "Organization id is required."
+    - 404 Not Found: "Organization not found."
+    """
     data = request.get_json()
     org_id = data.get('id')
     if not org_id:
         return jsonify({'error': 'Organization id is required.'}), 400
-    org = Organization.query.get(org_id)
+    org = db.session.get(Organization, org_id)
     if not org:
         return jsonify({'error': 'Organization not found.'}), 404
     return jsonify(org.to_dict()), 200
