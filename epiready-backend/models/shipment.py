@@ -18,6 +18,7 @@ class Shipment(db.Model):
     transit_time_hrs = db.Column(db.Integer, nullable=False)
     risk_factor = db.Column(db.String(50), nullable=False)
     mode_of_transport = db.Column(db.String(50), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
 
     status = db.Column(db.String(20), nullable=False)  # active, completed, cancelled
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False)
