@@ -30,7 +30,7 @@ def get_users_by_role(user_id):
     """
     GET /users/role/<role>
     
-    Get all users with a specific role. Only accessible by transporter_manager.
+    Get all users with a specific role in organization. Only accessible by transporter_manager.
     
     Possible Error Responses:
     - 403 Forbidden: "Access denied. Only transporter managers can view users by role."
@@ -48,7 +48,7 @@ def get_users_by_role(user_id):
         if role not in valid_roles:
             return jsonify({"error": f"Invalid role. Must be one of: {', '.join(valid_roles)}"}), 400
         
-        users = User.query.filter_by(role=role).all()
+        users = User.query.filter_by(role=role, organization_id=current_user.organization_id).all()
         return jsonify([user.to_dict() for user in users]), 200
         
     except Exception as e:
@@ -59,7 +59,7 @@ def get_all_users(user_id):
     """
     GET /users
     
-    Get all users. Only accessible by transporter_manager.
+    Get all users in organization. Only accessible by transporter_manager.
     
     Possible Error Responses:
     - 403 Forbidden: "Access denied. Only transporter managers can view all users."
@@ -70,7 +70,7 @@ def get_all_users(user_id):
         if current_user.role != 'transporter_manager':
             return jsonify({"error": "Access denied. Only transporter managers can view all users."}), 403
         
-        users = User.query.all()
+        users = User.query.filter_by(organization_id=current_user.organization_id).all()
         return jsonify([user.to_dict() for user in users]), 200
         
     except Exception as e:
@@ -90,11 +90,15 @@ def create_organization(user_id):
     org = Organization(name=name, join_code=join_code)
     db.session.add(org)
     db.session.commit()
+    # Assign current user to the organization and set their role
+    user = User.query.get(user_id)
+    user.organization_id = org.id
+    user.role = 'transporter_manager'
+    db.session.commit()
     return jsonify(org.to_dict()), 201
 
 @token_required
 def join_organization(user_id):
-    from models.user import User
     data = request.get_json()
     join_code = data.get('join_code')
     if not join_code:
@@ -111,7 +115,6 @@ def join_organization(user_id):
 
 @token_required
 def get_organization_by_id(user_id):
-    from models.organization import Organization
     data = request.get_json()
     org_id = data.get('id')
     if not org_id:
