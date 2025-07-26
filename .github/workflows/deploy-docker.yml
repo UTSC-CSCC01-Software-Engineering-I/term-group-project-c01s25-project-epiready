@@ -1,4 +1,4 @@
-name: Build and deploy to Docker Hub
+name: Deploy App and Test
 on:
   workflow_run:
     workflows: ["Publish Project Backend to Dockerhub", "Publish Project Frontend to Dockerhub"]
@@ -30,3 +30,8 @@ jobs:
           git checkout $GIT_TAG || true
           docker compose pull
           docker compose up -d
+          echo "Running Cypress tests in frontend container..."
+          docker exec frontend npx cypress run
+          echo "Running performance test on deployed website..."
+          sudo apt-get update && sudo apt-get install -y apache2-utils
+          ab -n 100 -c 10 https://epiready.taggit.tech/
