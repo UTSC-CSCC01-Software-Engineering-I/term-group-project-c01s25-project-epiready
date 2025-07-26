@@ -25,7 +25,8 @@ jobs:
           git checkout main
           git pull origin
           TAG_NO_V=${GIT_TAG#v}
+          export TAG_NO_V
           echo "Deploying version: $TAG_NO_V"
           git checkout $GIT_TAG || true
           docker compose pull
-          TAG_NO_V=$TAG_NO_V docker compose up -d
+          docker compose up -d
