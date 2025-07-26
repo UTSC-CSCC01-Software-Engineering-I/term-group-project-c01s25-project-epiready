@@ -22,9 +22,10 @@ jobs:
         envs: GIT_TAG
         script: |
           cd epiready
+          git checkout main
           git pull origin
           TAG_NO_V=${GIT_TAG#v}
           echo "Deploying version: $TAG_NO_V"
           git checkout $GIT_TAG || true
           docker compose pull
-          GIT_TAG=$TAG_NO_V docker compose up -d
+          TAG_NO_V=$TAG_NO_V docker compose up -d

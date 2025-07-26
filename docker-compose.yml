@@ -1,12 +1,12 @@
 services:
   frontend:
-    image: epireadydev/epiready-frontend:${GIT_TAG}
+    image: epireadydev/epiready-frontend:${TAG_NO_V}
     container_name: frontend
     expose:
       - "80"
     restart: always
   backend:
-    image: epireadydev/epiready-backend:${GIT_TAG}
+    image: epireadydev/epiready-backend:${TAG_NO_V}
     container_name: backend
     env_file: epiready-backend/.env
     ports:
