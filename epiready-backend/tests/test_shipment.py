@@ -13,6 +13,7 @@ def _q(obj):
         def first(self): return obj
         def count(self): return 0
         def order_by(self, *args, **kwargs): return self
+        def limit(self, *args, **kwargs): return self
     return Q()
 
 
