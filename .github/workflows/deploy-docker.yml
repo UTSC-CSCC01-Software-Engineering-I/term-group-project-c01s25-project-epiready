@@ -22,8 +22,7 @@ jobs:
         envs: GIT_TAG
         script: |
           cd epiready
-          git checkout main
-          git pull origin
+          git fetch --tags
           TAG_NO_V=${GIT_TAG#v}
           export TAG_NO_V
           echo "Deploying version: $TAG_NO_V"
