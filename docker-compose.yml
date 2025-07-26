@@ -1,4 +1,18 @@
 services:
+  cypress:
+    image: cypress/included:12.17.4
+    container_name: cypress
+    depends_on:
+      - frontend
+      - backend
+      - postgres
+      - nginx
+    environment:
+      - CYPRESS_baseUrl=https://epiready.taggit.tech
+    working_dir: /e2e
+    volumes:
+      - ./epiready-frontend/cypress:/e2e
+    entrypoint: ["npx", "cypress", "run"]
   frontend:
     image: epireadydev/epiready-frontend:${TAG_NO_V}
     container_name: frontend
