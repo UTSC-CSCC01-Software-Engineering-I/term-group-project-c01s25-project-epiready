@@ -1,50 +1,38 @@
-version: "3.8"
-
 services:
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx-proxy
+  frontend:
+    image: epireadydev/epiready-frontend:${GIT_TAG}
+    container_name: frontend
+    expose:
+      - "80"
+    restart: always
+  backend:
+    image: epireadydev/epiready-backend:${GIT_TAG}
+    container_name: backend
+    env_file: epiready-backend/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    restart: always
+
+  nginx:
+    image: staticfloat/nginx-certbot
+    container_name: nginx
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./certs:/etc/nginx/certs
-      - ./vhost:/etc/nginx/vhost.d
-      - ./html:/usr/share/nginx/html
-  nginx-proxy-acme:
-    image: nginxproxy/acme-companion
-    container_name: nginx-proxy-acme
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./certs:/etc/nginx/certs
-      - ./vhost:/etc/nginx/vhost.d
-      - ./html:/usr/share/nginx/html
-      - ./acme:/etc/acme.sh
+      - ./nginx/conf.d:/etc/nginx/user.conf.d:ro
+      - ./nginx/certbot:/etc/letsencrypt
     environment:
-      - DEFAULT_EMAIL=shubham.garg@mail.utoronto.ca
-      - NGINX_PROXY_CONTAINER=nginx-proxy
-  backend:
-    image: epireadydev/epiready-backend:latest
-    container_name: backend
+      - CERTBOT_EMAIL=shubham.garg@mail.utoronto.ca
+      - CERTBOT_DOMAINS=epiready.taggit.tech,api.epiready.taggit.tech
+      - CERTBOT_EXTRA_ARGS=--agree-tos
+    depends_on:
+      - frontend
+      - backend
     restart: always
-    expose:
-      - 5000
-    env_file:
-      - ./epiready-backend/.env
-    environment:
-      - VIRTUAL_HOST=api.epiready.taggit.tech
-      - LETSENCRYPT_HOST=api.epiready.taggit.tech
 
-  frontend:
-    image: epireadydev/epiready-frontend:latest
-    container_name: frontend
-    restart: always
-    expose:
-      - 80
-    environment:
-      - VIRTUAL_HOST=epiready.taggit.tech
-      - LETSENCRYPT_HOST=epiready.taggit.tech
   postgres:
     image: postgres:15-alpine
     container_name: postgres
@@ -57,68 +45,3 @@ services:
 
 volumes:
   postgres_data:
-
-# #####################################################
-
-
-
-# version: "3.7"
-
-# services:
-#   nginx-proxy:
-#     image: jwilder/nginx-proxy
-#     container_name: nginx-proxy
-#     ports:
-#       - "80:80"
-#       - "443:443"
-#     volumes:
-#       - /var/run/docker.sock:/tmp/docker.sock:ro
-#       - ./certs:/etc/nginx/certs
-#       - ./vhost:/etc/nginx/vhost.d
-#       - ./html:/usr/share/nginx/html
-#   nginx-proxy-acme:
-#     image: nginxproxy/acme-companion
-#     container_name: nginx-proxy-acme
-#     volumes:
-#       - /var/run/docker.sock:/var/run/docker.sock:ro
-#       - ./certs:/etc/nginx/certs
-#       - ./vhost:/etc/nginx/vhost.d
-#       - ./html:/usr/share/nginx/html
-#       - ./acme:/etc/acme.sh
-#     environment:
-#       - DEFAULT_EMAIL=gargshubham2005@gmail.com
-#       - NGINX_PROXY_CONTAINER=nginx-proxy
-#   backend:
-#     image: epireadydev/epiready-backend:latest
-#     container_name: backend
-#     restart: always
-#     expose:
-#       - 5000
-#     env_file:
-#       - ./epiready-backend/.env
-#     environment:
-#       - VIRTUAL_HOST=api-epiready.duckdns.org
-#       - LETSENCRYPT_HOST=api-epiready.duckdns.org
-
-#   frontend:
-#     image: epireadydev/epiready-frontend:latest
-#     container_name: frontend
-#     restart: always
-#     expose:
-#       - 80
-#     environment:
-#       - VIRTUAL_HOST=epiready.duckdns.org
-#       - LETSENCRYPT_HOST=epiready.duckdns.org
-
-#   postgres:
-#     image: postgres:15-alpine
-#     container_name: postgres
-#     environment:
-#       POSTGRES_USER: ${POSTGRES_USER}
-#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-#       POSTGRES_DB: ${POSTGRES_DB}
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-
-#   volumes:
-#     postgres_data:

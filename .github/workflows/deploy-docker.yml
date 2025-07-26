@@ -1,0 +1,30 @@
+name: Build and deploy to Docker Hub
+on:
+  workflow_run:
+    workflows: ["build-frontend", "build-backend"]
+    types:
+      - completed
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GIT_TAG: ${{ github.ref_name }}
+    steps:
+    - name: SSH into VM and deploy
+      uses: appleboy/ssh-action@v1
+      with:
+        host: "15.222.16.78"
+        username: ubuntu
+        key: ${{ secrets.KEY }}
+        port: 22
+        envs: GIT_TAG
+        script: |
+          cd epiready
+          git pull
+          echo "Deploying version: $GIT_TAG"
+          # Optionally checkout the tag if needed
+          git checkout $GIT_TAG || true
+          docker compose pull
+          GIT_TAG=$GIT_TAG docker compose up -d
