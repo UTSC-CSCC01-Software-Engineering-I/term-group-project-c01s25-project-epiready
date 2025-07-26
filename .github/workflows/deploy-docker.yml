@@ -22,8 +22,7 @@ jobs:
         envs: GIT_TAG
         script: |
           cd epiready
-          git pull https://shubhmgrg:${{ secrets.CR_TOKEN }}@github.com/UTSC-CSCC01-Software-Engineering-I/term-group-project-c01s25-project-epiready.git
-          git fetch --tags
+          git pull origin
           echo "Deploying version: $GIT_TAG"
           git checkout $GIT_TAG || true
           docker compose pull
