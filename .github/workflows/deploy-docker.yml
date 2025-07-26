@@ -1,7 +1,7 @@
 name: Build and deploy to Docker Hub
 on:
   workflow_run:
-    workflows: ["build-frontend", "build-backend"]
+    workflows: ["Publish Project Backend to Dockerhub", "Publish Project Frontend to Dockerhub"]
     types:
       - completed
   workflow_dispatch:

@@ -12,6 +12,7 @@ def _q(obj):
         def all(self): return [obj] if obj else []
         def first(self): return obj
         def count(self): return 0
+        def order_by(self, *args, **kwargs): return self
     return Q()
 
 
