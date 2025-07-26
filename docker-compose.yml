@@ -11,7 +11,7 @@ services:
       - CYPRESS_baseUrl=https://epiready.taggit.tech
     working_dir: /e2e
     volumes:
-      - ./epiready-frontend/cypress:/e2e
+      - ./epiready-frontend:/e2e
     entrypoint: ["npx", "cypress", "run"]
   frontend:
     image: epireadydev/epiready-frontend:${TAG_NO_V}
