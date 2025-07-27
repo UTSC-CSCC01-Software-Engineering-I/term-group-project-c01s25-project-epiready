@@ -32,7 +32,7 @@ def create_app():
     app.config['MAIL_USE_TLS'] = True
     
     from socket_events import register_socketio_events
-    from models import user, shipment, temperature, alert, weather, shipment_action
+    from models import user, shipment, temperature, alert, weather, shipment_action, chat
 
     migrate = Migrate(app, db)
     socketio.init_app(app)

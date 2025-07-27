@@ -1,0 +1,158 @@
+.chat-sidebar {
+    width: 300px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Unageo', system-ui, sans-serif;
+}
+
+.new-chat-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background-color: #089a08;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    font-family: 'Unageo', system-ui, sans-serif;
+}
+
+.new-chat-btn:hover {
+    background-color: #037815;
+}
+
+.new-chat-btn:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+.chat-rooms-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.chat-room-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #333;
+}
+
+.chat-room-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.chat-room-item.selected {
+    background-color: rgba(8, 154, 8, 0.2);
+    border-left: 3px solid #089a08;
+}
+
+.room-icon {
+    font-size: 20px;
+    margin-right: 12px;
+    width: 24px;
+    text-align: center;
+}
+
+.room-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.room-name {
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Unageo', system-ui, sans-serif;
+}
+
+.room-type {
+    font-size: 12px;
+    color: #ccc;
+    font-family: 'Unageo', system-ui, sans-serif;
+}
+
+.message-count {
+    background-color: #089a08;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Unageo', system-ui, sans-serif;
+}
+
+.no-chats {
+    padding: 40px 20px;
+    text-align: center;
+    color: #ccc;
+}
+
+.no-chats p {
+    margin-bottom: 20px;
+    font-family: 'Unageo', system-ui, sans-serif;
+}
+
+.start-chat-btn {
+    background-color: #089a08;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    font-family: 'Unageo', system-ui, sans-serif;
+    font-weight: 600;
+}
+
+.start-chat-btn:hover {
+    background-color: #037815;
+}
+
+.loading {
+    padding: 40px 20px;
+    text-align: center;
+    color: #ccc;
+    font-family: 'Unageo', system-ui, sans-serif;
+}
+
+@media (max-width: 768px) {
+    .chat-sidebar {
+        width: 100%;
+        height: 200px;
+        border-right: none;
+        border-bottom: 1px solid #333;
+    }
+} 

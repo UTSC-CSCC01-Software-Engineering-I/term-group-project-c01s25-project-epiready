@@ -32,6 +32,9 @@ export default function Navbar({ currentPage }) {
         <NavbarLink to="/organization" currentPage={currentPage}>
           Organization
         </NavbarLink>
+        <NavbarLink to="/chat" currentPage={currentPage}>
+          Chat
+        </NavbarLink>
         {loggedIn ? (
           <button
             className="hover:bg-red-600 hover:text-black"
