@@ -1,0 +1,61 @@
+services:
+  cypress:
+    image: cypress/included:12.17.4
+    container_name: cypress
+    depends_on:
+      - frontend
+      - backend
+      - postgres
+      - nginx
+    environment:
+      - CYPRESS_baseUrl=https://epiready.taggit.tech
+    working_dir: /e2e
+    volumes:
+      - ./epiready-frontend:/e2e
+    entrypoint: ["npx", "cypress", "run"]
+  frontend:
+    image: epireadydev/epiready-frontend:${TAG_NO_V}
+    container_name: frontend
+    expose:
+      - "80"
+    restart: always
+  backend:
+    image: epireadydev/epiready-backend:${TAG_NO_V}
+    container_name: backend
+    env_file: epiready-backend/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    restart: always
+
+  nginx:
+    image: staticfloat/nginx-certbot
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/user.conf.d:ro
+      - ./nginx/certbot:/etc/letsencrypt
+    environment:
+      - CERTBOT_EMAIL=shubham.garg@mail.utoronto.ca
+      - CERTBOT_DOMAINS=epiready.taggit.tech,api.epiready.taggit.tech
+      - CERTBOT_EXTRA_ARGS=--agree-tos
+    depends_on:
+      - frontend
+      - backend
+    restart: always
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
