@@ -66,6 +66,7 @@ def create_shipment(user_id):
             transit_time_hrs=data['transit_time_hrs'],
             risk_factor=data['risk_factor'],
             mode_of_transport=data['mode_of_transport'],
+            organization_id=user.organization_id,
             status=data['status'],
             expected_arrival=datetime.fromisoformat(data['expected_arrival']) if data.get('expected_arrival') else None,
             current_location=data.get('current_location', None)
@@ -142,7 +143,7 @@ def get_all_shipments(user_id):
     """
     GET /shipments/all
 
-    Get all shipments in the system. Only accessible by transporter managers.
+    Get all shipments in the organization. Only accessible by transporter managers.
 
     Possible Error Responses:
     - 403 Forbidden: "Access denied. Only transporter managers can view all shipments."
@@ -154,7 +155,7 @@ def get_all_shipments(user_id):
         return jsonify({'error': 'Access denied. Only transporter managers can view all shipments.'}), 403
     
     try:
-        shipments = Shipment.query.all()
+        shipments = Shipment.query.filter_by(organization_id=user.organization_id).all()
         return jsonify([shipment.to_dict() for shipment in shipments]), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -166,7 +167,7 @@ def get_shipment_by_name(user_id, name):
 
     Get a specific shipment by name.
     - Regular users: Can only access their own shipments
-    - Transporter managers: Can access any shipment
+    - Transporter managers: Can access any shipment in the organization
 
     Possible Error Responses:
     - 404 Not Found: "Shipment not found"
@@ -177,7 +178,7 @@ def get_shipment_by_name(user_id, name):
     
     try:
         if user.role == 'transporter_manager':
-            shipment = Shipment.query.filter_by(name=name).first()
+            shipment = Shipment.query.filter_by(name=name, organization_id=user.organization_id).first()
         else:
             shipment = Shipment.query.filter_by(name=name, user_id=user_id).first()
             
@@ -206,6 +207,8 @@ def get_weather_data(user_id, shipment_id):
     user = User.query.get(user_id)
     if user.role != 'transporter_manager' and shipment.user_id != user_id:
         return jsonify({'error': 'Access denied. You can only view weather data for your own shipments.'}), 403
+    elif shipment.organization_id != user.organization_id:
+        return jsonify({'error': 'Access denied. You can only view weather data for shipments in your own organization.'}), 403
     try:
         weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).order_by(WeatherData.id.desc()).limit(70).all()
         temp_data = []
@@ -247,6 +250,8 @@ def get_latest_weather_data(user_id, shipment_id):
     user = User.query.get(user_id)
     if user.role != 'transporter_manager' and shipment.user_id != user_id:
         return jsonify({'error': 'Access denied. You can only view weather data for your own shipments.'}), 403
+    elif shipment.organization_id != user.organization_id:
+        return jsonify({'error': 'Access denied. You can only view weather data for shipments in your own organization.'}), 403
     try:
         weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).order_by(WeatherData.id.desc()).first()
         if not weather_data:
@@ -263,3 +268,36 @@ def get_latest_weather_data(user_id, shipment_id):
 #         return jsonify(shipment.to_dict()), 200
 #     except Exception as e:
 #         return jsonify({'error': str(e)}), 500
+
+@token_required
+def update_shipment_status(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 401
+    
+    data = request.get_json()
+    shipment_id = data.get("shipment_id")
+    
+    if not data or 'status' not in data:
+        return jsonify({'error': 'Missing required field: status'}), 400
+
+    status = data['status'].lower()
+    if status not in ['active', 'completed', 'cancelled']:
+        return jsonify({'error': 'Invalid status'}), 400
+    
+    print(status, shipment_id)
+
+    if user.role == 'transporter_manager':
+        shipment = Shipment.query.filter_by(id=shipment_id, organization_id=user.organization_id).first()
+    else:
+        shipment = Shipment.query.filter_by(id=shipment_id, user_id=user_id).first()
+
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+
+    shipment.status = status
+    shipment.updated_at = datetime.now(timezone.utc)
+
+    db.session.commit()
+
+    return jsonify(shipment.to_dict()), 200
