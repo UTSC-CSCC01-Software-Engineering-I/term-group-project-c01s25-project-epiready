@@ -10,6 +10,8 @@ from auth.auth import token_required
 from flask_mail import Message, Mail
 import eventlet
 
+eventlet.monkey_patch()
+
 def parse_temp_range(temp_range):
     """Parses a string like '2 to 8' into (2.0, 8.0)."""
     try:
