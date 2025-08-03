@@ -32,7 +32,7 @@ const ChatInterface = () => {
 
         // Import socket.io-client dynamically
         import('socket.io-client').then(({ default: io }) => {
-            socketRef.current = io('http://127.0.0.1:5000', {
+            socketRef.current = io(`${import.meta.env.VITE_BACKEND_URL}`, {
                 auth: { token: `${token}` }
             });
 
@@ -55,7 +55,7 @@ const ChatInterface = () => {
         if (!token) return;
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/api/chat/rooms", {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/rooms`, {
                 headers: {
                     "Authorization": `${token}`
                 }
@@ -90,7 +90,7 @@ const ChatInterface = () => {
         if (!token) return;
 
         try {
-            const response = await fetch(`http://127.0.0.1:5000/api/chat/messages?room_id=${roomId}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/messages?room_id=${roomId}`, {
                 headers: {
                     "Authorization": `${token}`
                 }
