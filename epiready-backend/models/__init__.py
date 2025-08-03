@@ -5,6 +5,7 @@ from .shipment_action import ShipmentAction
 from .temperature import TemperatureData             
 from .user import User                           
 from .weather import WeatherData                     
+from .chat import ChatRoom, ChatMessage
 
 __all__ = [
     "Alert",
@@ -14,4 +15,6 @@ __all__ = [
     "TemperatureData",
     "User",
     "WeatherData",
+    "ChatRoom",
+    "ChatMessage",
 ]
