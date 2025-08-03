@@ -49,10 +49,15 @@ export default function ShipmentPage() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [temperatureData, setTemperatureData] = useState([]);
   const [humidityData, setHumidityData] = useState([]);
+  const [latestWeatherData, setLatestWeatherData] = useState(null);
   const { loggedIn } = useGlobal();
   const socket = useSocket();
 
   const googleMapsApiKey = import.meta.env.VITE_MAPS_KEY;
+
+  
+  const ranks = {1: "low", 2: "medium", 3: "high", 4: "very high"}
+
 
   useEffect(() => {
     if (weatherData && weatherData.temperature) {
@@ -64,18 +69,33 @@ export default function ShipmentPage() {
           minRange: shipmentDetails?.min_temp,
           maxRange: shipmentDetails?.max_temp,
         };
-      });
+      }); // Reverse to show latest first
       setTemperatureData(tempData);
+
+      setLatestWeatherData(weatherData.all[0]);
 
       const humidityDataArr = weatherData.humidity.map((entry) => {
         return {
           time: entry.timestamp,
           humidity: entry.humidity,
         };
-      });
+      }); // Reverse to show latest first
       setHumidityData(humidityDataArr);
     }
   }, [weatherData]);
+
+
+useEffect(() => {
+  if (latestWeatherData && !liveData) {
+    setLiveData({
+      'severity': ranks[latestWeatherData.aqi || 1],
+      'humidity': latestWeatherData.humidity,
+      'internal_temperature': latestWeatherData.internal_temp,
+      'external_temperature': latestWeatherData.external_temp
+    });
+  }
+}, [latestWeatherData]);
+
 
   // const alertsData = [
   //   { name: 'Temperature', value: 2, color: '#ef4444' },
@@ -341,10 +361,7 @@ export default function ShipmentPage() {
           {info.current_location}
         </div>
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
-          <span className="font-semibold" style={{ color: "#5e7c4e" }}>
-            Risk:
-          </span>{" "}
-          {info.risk_factor}
+          <span className="font-semibold" style={{ color: "#5e7c4e" }}>Risk:</span> {liveData?.severity || "low"}
         </div>
         <div className="basis-[45%] text-[#d1d5db] text-2xl">
           <span className="font-semibold" style={{ color: "#5e7c4e" }}>

@@ -119,11 +119,11 @@ def start_temperature_monitor(socketio, app, mail):
                         breach_type = "Temp+Humidity"
                     else:
                         breach_type = "Humidity"
+                
+                severity = "low"
 
                 # Create alert in database if there's a breach and send email
                 if breach:                      
-                    
-                    severity = "low"
                     
                     temp_deviation = 0
                     if "Temp" in breach_type:
@@ -218,14 +218,15 @@ def start_temperature_monitor(socketio, app, mail):
                     'humidity': humidity,
                     'shipment_id': shipment.id,
                     'breach': breach,
-                    'breach_type': breach_type
+                    'breach_type': breach_type,
+                    'severity': severity,
                 }
-                create_weather_data(shipment.user_id, shipment.id, str(lat) + " " + str(lon), internal_temp, external_temp, humidity, None, timestamp)
+                create_weather_data(shipment.user_id, shipment.id, str(lat) + " " + str(lon), internal_temp, external_temp, humidity, severity_rank(severity), timestamp)
                 socketio.emit('temperature_alert', data, room=str(shipment.user_id))
                 
                 # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
 
-            eventlet.sleep(30)
+            eventlet.sleep(200)
 
 @token_required
 def get_alerts_for_user(user_id):

@@ -1,0 +1,36 @@
+name: Deploy App and Test
+on:
+  workflow_run:
+    workflows: ["Publish Project Backend to Dockerhub", "Publish Project Frontend to Dockerhub"]
+    types:
+      - completed
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GIT_TAG: ${{ github.ref_name }}
+    steps:
+    - name: SSH into VM and deploy
+      uses: appleboy/ssh-action@v1
+      with:
+        host: "15.222.16.78"
+        username: ubuntu
+        key: ${{ secrets.KEY }}
+        port: 22
+        envs: GIT_TAG
+        script: |
+          cd epiready
+          git fetch --tags
+          TAG_NO_V=${GIT_TAG#v}
+          export TAG_NO_V
+          echo "Deploying version: $TAG_NO_V"
+          git checkout $GIT_TAG || true
+          docker compose pull
+          docker compose up -d
+          echo "Running Cypress tests in Cypress container..."
+          docker compose run --rm cypress
+          echo "Running performance test on deployed website..."
+          sudo apt-get update && sudo apt-get install -y apache2-utils
+          ab -n 100 -c 10 https://epiready.taggit.tech/

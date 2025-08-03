@@ -58,7 +58,8 @@ def add_security_headers(response):
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['Content-Security-Policy'] = "frame-ancestors 'none';"
     return response
-        
-        
-if __name__ == '__main__':
+
+
+if __name__ == '__main__' and os.getenv("FLASK_ENV") == "development":
+
     socketio.run(app, debug=True)

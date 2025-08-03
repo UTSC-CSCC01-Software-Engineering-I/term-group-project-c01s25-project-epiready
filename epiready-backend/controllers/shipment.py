@@ -180,15 +180,15 @@ def get_weather_data(user_id, shipment_id):
     elif shipment.organization_id != user.organization_id:
         return jsonify({'error': 'Access denied. You can only view weather data for shipments in your own organization.'}), 403
     try:
-        weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).all()
+        weather_data = WeatherData.query.filter_by(shipment_id=shipment_id, user_id=shipment.user_id).order_by(WeatherData.id.desc()).limit(70).all()
         temp_data = []
         humidity_data = []
         for w in weather_data:
             w_dict = w.to_dict() if hasattr(w, 'to_dict') else dict(w)
             # Group temperature and humidity as requested
             temp_entry = {
-                'internal': w_dict.get('internal_temperature') if 'internal_temperature' in w_dict else w_dict.get('temperature'),
-                'external': w_dict.get('external_temperature'),
+                'internal': w_dict.get('internal_temp') if 'internal_temp' in w_dict else w_dict.get('temperature'),
+                'external': w_dict.get('external_temp'),
                 'timestamp': w_dict.get('timestamp')
             }
             temp_data.append(temp_entry)
