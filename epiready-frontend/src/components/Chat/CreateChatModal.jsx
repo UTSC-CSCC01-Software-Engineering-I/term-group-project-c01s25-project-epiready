@@ -17,7 +17,7 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
         if (!token) return;
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/api/chat/users", {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/users`, {
                 headers: {
                     "Authorization": `${token}`
                 }
@@ -65,7 +65,7 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
                 ? { other_user_id: selectedUsers[0] }
                 : { name: groupName, participant_ids: selectedUsers };
 
-            const response = await fetch(`http://127.0.0.1:5000/api/chat${endpoint}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
