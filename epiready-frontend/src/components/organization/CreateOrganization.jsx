@@ -15,7 +15,7 @@ export default function CreateOrganizationPopup({ trigger, onOrganizationCreated
 
         const token = sessionStorage.getItem("token");
 
-        fetch("http://127.0.0.1:5000/api/users/organization", {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/create-organization`, {
             method: "POST",
             body: JSON.stringify({
                 name: name,

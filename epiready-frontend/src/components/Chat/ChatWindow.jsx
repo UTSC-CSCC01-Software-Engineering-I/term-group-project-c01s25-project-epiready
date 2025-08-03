@@ -6,6 +6,7 @@ const ChatWindow = ({ selectedRoom, messages, onSendMessage }) => {
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef(null);
     const { loggedIn } = useGlobal();
+    const [currentUser, setCurrentUser] = useState(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -14,6 +15,34 @@ const ChatWindow = ({ selectedRoom, messages, onSendMessage }) => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Fetch current user information when component mounts
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            const token = sessionStorage.getItem("token");
+            if (!token) return;
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/users", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    setCurrentUser(userData);
+                }
+            } catch (error) {
+                console.error('Error fetching current user:', error);
+            }
+        };
+
+        if (loggedIn) {
+            fetchCurrentUser();
+        }
+    }, [loggedIn]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
@@ -29,9 +58,8 @@ const ChatWindow = ({ selectedRoom, messages, onSendMessage }) => {
     };
 
     const isOwnMessage = (message) => {
-        // This would need to be enhanced to get current user ID
-        // For now, we'll use a simple check
-        return message.sender_email === loggedIn?.email;
+        // Compare sender_id with current user's id for reliable identification
+        return currentUser && message.sender_id === currentUser.id;
     };
 
     if (!selectedRoom) {

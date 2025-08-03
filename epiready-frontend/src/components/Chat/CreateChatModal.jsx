@@ -19,7 +19,7 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
         try {
             const response = await fetch("http://127.0.0.1:5000/api/chat/users", {
                 headers: {
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `${token}`
                 }
             });
 
@@ -69,7 +69,7 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `${token}`
                 },
                 body: JSON.stringify(body)
             });

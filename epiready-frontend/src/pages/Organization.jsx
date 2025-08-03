@@ -22,7 +22,7 @@ export default function Organization() {
         if (!token) return;
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/api/users", {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users`, {
                 method: "POST",
                 headers: {
                     "Authorization": token
@@ -33,9 +33,10 @@ export default function Organization() {
                 const userData = await response.json();
                 if (userData.organization_id) {
                     // Fetch the organization details from the backend
-                    const orgResp = await fetch(`http://127.0.0.1:5000/api/users/organization?id=${userData.organization_id}`, {
+                    const orgResp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/organization?id=${userData.organization_id}`, {
                         method: "GET",
                         headers: {
+                            "Content-Type": "application/json",
                             "Authorization": token
                         }
                     });

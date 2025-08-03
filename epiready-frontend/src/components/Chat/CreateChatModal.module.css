@@ -114,7 +114,7 @@
 }
 
 .group-name-input input:focus {
-    border-color: #089a08;
+    border-color: #869F77;
 }
 
 .group-name-input input::placeholder {
@@ -210,7 +210,7 @@
 
 .create-button {
     padding: 10px 20px;
-    background-color: #089a08;
+    background-color: #869F77;
     color: white;
     border: none;
     border-radius: 0.5em;
