@@ -53,7 +53,7 @@ class Shipment(db.Model):
         }
 
 @event.listens_for(Shipment, 'before_update')
-def validate_completed_shipment(target):
+def validate_completed_shipment(mapper, connection, target):
     if isinstance(target, Shipment):
         if target.status == 'completed' and not target.actual_arrival:
             target.actual_arrival = datetime.now(timezone.utc)

@@ -24,6 +24,7 @@ import MapComponent from '../components/maps/MapComponent';
 import { useGlobal } from '../LoggedIn';
 import { useSocket } from '../Socket';
 import ActionModal from '../components/Shipment/ActionModal';
+import TransitStatusModal from "./TransitStatusModal";
 
 
 export default function ShipmentPage() {
@@ -45,6 +46,9 @@ export default function ShipmentPage() {
   const [temperatureData, setTemperatureData] = useState([]);
   const [humidityData, setHumidityData] = useState([]);
   const [latestWeatherData, setLatestWeatherData] = useState(null);
+  const [showTransitModal, setShowTransitModal] = useState(false);
+  const [transitLoading, setTransitLoading] = useState(false);
+  const [transitError, setTransitError] = useState("");
   const { loggedIn } = useGlobal();
   const socket = useSocket();
 
@@ -268,6 +272,34 @@ useEffect(() => {
       });
   };
 
+  // Handler for submitting transit status
+  const handleTransitStatusSubmit = (status) => {
+    setTransitLoading(true);
+    setTransitError("");
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/shipments/${shipmentDetails.id}/transit_status`, {
+      method: "POST",
+      headers: {
+        "Authorization": sessionStorage.getItem("token"),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ status })
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to set transit status");
+        return response.json();
+      })
+      .then((data) => {
+        setShowTransitModal(false);
+        setTransitLoading(false);
+        setTransitError("");
+        setShipmentDetails(data); // Update details with new status
+      })
+      .catch((error) => {
+        setTransitError(error.message);
+        setTransitLoading(false);
+      });
+  };
+
 
 
   useEffect(() => {
@@ -338,8 +370,16 @@ useEffect(() => {
         </div>
       </div>
       <div className="flex flex-col sm:flex-row justify-evenly items-center mt-6 w-full max-w-2xl mx-auto">
+        <TransitStatusModal
+          open={showTransitModal}
+          onClose={() => { setShowTransitModal(false); setTransitError(""); }}
+          onSubmit={handleTransitStatusSubmit}
+          loading={transitLoading}
+          error={transitError}
+        />
         <button
           className="flex-1 px-6 py-3 rounded-lg font-semibold text-white mx-2 my-1 sm:my-0 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-[#6B805E] hover:bg-[#4e6147] focus:bg-[#4e6147]"
+          onClick={() => setShowTransitModal(true)}
         >
           Set Transit Status
         </button>
