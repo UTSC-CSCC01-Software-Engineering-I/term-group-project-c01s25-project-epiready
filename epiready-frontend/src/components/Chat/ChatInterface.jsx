@@ -33,7 +33,7 @@ const ChatInterface = () => {
         // Import socket.io-client dynamically
         import('socket.io-client').then(({ default: io }) => {
             socketRef.current = io('http://127.0.0.1:5000', {
-                auth: { token: `Bearer ${token}` }
+                auth: { token: `${token}` }
             });
 
             socketRef.current.on('connect', () => {
@@ -57,7 +57,7 @@ const ChatInterface = () => {
         try {
             const response = await fetch("http://127.0.0.1:5000/api/chat/rooms", {
                 headers: {
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `${token}`
                 }
             });
 
@@ -80,7 +80,7 @@ const ChatInterface = () => {
         if (socketRef.current) {
             socketRef.current.emit('join_chat_room', {
                 room_id: room.id,
-                token: `Bearer ${sessionStorage.getItem("token")}`
+                token: `${sessionStorage.getItem("token")}`
             });
         }
     };
@@ -92,13 +92,13 @@ const ChatInterface = () => {
         try {
             const response = await fetch(`http://127.0.0.1:5000/api/chat/messages?room_id=${roomId}`, {
                 headers: {
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `${token}`
                 }
             });
 
             if (response.ok) {
                 const messagesData = await response.json();
-                setMessages(messagesData);
+                setMessages(messagesData.reverse());
             }
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -118,27 +118,27 @@ const ChatInterface = () => {
                     room_id: selectedRoom.id,
                     content: content.trim(),
                     message_type: 'text',
-                    token: `Bearer ${token}`
+                    token: `${token}`
                 });
             }
 
             // Also send via REST API for persistence
-            const response = await fetch("http://127.0.0.1:5000/api/chat/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    room_id: selectedRoom.id,
-                    content: content.trim(),
-                    message_type: 'text'
-                })
-            });
+            // const response = await fetch("http://127.0.0.1:5000/api/chat/messages", {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //         "Authorization": `${token}`
+            //     },
+            //     body: JSON.stringify({
+            //         room_id: selectedRoom.id,
+            //         content: content.trim(),
+            //         message_type: 'text'
+            //     })
+            // });
 
-            if (!response.ok) {
-                console.error('Failed to send message via REST API');
-            }
+            // if (!response.ok) {
+            //     console.error('Failed to send message via REST API');
+            // }
         } catch (error) {
             console.error('Error sending message:', error);
         }

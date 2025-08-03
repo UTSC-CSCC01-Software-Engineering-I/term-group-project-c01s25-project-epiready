@@ -14,7 +14,7 @@ export default function JoinOrganizationPopup({ trigger, onOrganizationJoined })
 
         const token = sessionStorage.getItem("token");
 
-        fetch("http://127.0.0.1:5000/api/users/join-organization", {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/join-organization`, {
             method: "POST",
             body: JSON.stringify({
                 join_code: joinCode
