@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, jsonify
 from flask_mail import Mail
 from flask_cors import CORS
@@ -58,6 +60,4 @@ def add_security_headers(response):
         
         
 if __name__ == '__main__':
-    import eventlet
-    eventlet.monkey_patch()
     socketio.run(app, debug=True)

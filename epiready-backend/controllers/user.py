@@ -149,19 +149,13 @@ def get_organization_by_id(user_id):
     """
     GET /users/organization
     
-    Get organization details by id (in JSON body).
-    
-    Request Body:
-    {
-        "id": 123
-    }
+    Get organization details by id.
     
     Possible Error Responses:
     - 400 Bad Request: "Organization id is required."
     - 404 Not Found: "Organization not found."
     """
-    data = request.get_json()
-    org_id = data.get('id')
+    org_id = request.args.get('id')
     if not org_id:
         return jsonify({'error': 'Organization id is required.'}), 400
     org = db.session.get(Organization, org_id)

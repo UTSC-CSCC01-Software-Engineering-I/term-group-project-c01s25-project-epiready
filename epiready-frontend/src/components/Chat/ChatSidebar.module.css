@@ -27,7 +27,7 @@
     height: 32px;
     border-radius: 50%;
     border: none;
-    background-color: #089a08;
+    background-color: #869F77;
     color: white;
     font-size: 18px;
     cursor: pointer;
@@ -68,7 +68,7 @@
 
 .chat-room-item.selected {
     background-color: rgba(8, 154, 8, 0.2);
-    border-left: 3px solid #089a08;
+    border-left: 3px solid #869F77;
 }
 
 .room-icon {
@@ -100,7 +100,7 @@
 }
 
 .message-count {
-    background-color: #089a08;
+    background-color: #869F77;
     color: white;
     border-radius: 50%;
     width: 20px;
@@ -125,7 +125,7 @@
 }
 
 .start-chat-btn {
-    background-color: #089a08;
+    background-color: #869F77;
     color: white;
     border: none;
     padding: 10px 20px;
