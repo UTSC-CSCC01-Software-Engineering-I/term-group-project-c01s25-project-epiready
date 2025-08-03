@@ -1,5 +1,6 @@
-import eventlet
-eventlet.monkey_patch()
+if __name__ == '__main__':
+    import eventlet
+    eventlet.monkey_patch()
 from flask import Flask, jsonify
 from flask_mail import Mail
 from flask_cors import CORS
