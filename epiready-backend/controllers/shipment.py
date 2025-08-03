@@ -86,7 +86,7 @@ def get_shipments_by_user(user_id):
     """
     GET /shipments
 
-    Get all shipments related to the user.
+    Get all shipments related to the user based on their role.
 
     Query Parameters:
     - page: Page number for pagination (optional, default is 1)
@@ -98,7 +98,13 @@ def get_shipments_by_user(user_id):
     page = request.args.get('page', 1, type=int)
     per_page = 15
     try:
-        base_query = Shipment.query.filter_by(user_id=user_id)
+        user = User.query.get(user_id)
+
+        if user.role == 'transporter_manager':
+            base_query = Shipment.query.filter_by(organization_id=user.organization_id)
+        else:
+            base_query = Shipment.query.filter_by(user_id=user_id)
+        
         total_count = base_query.count()
         shipments = base_query.order_by(Shipment.created_at.desc()).offset((page - 1) * per_page).limit(per_page).all()
         return jsonify({
