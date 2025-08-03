@@ -136,9 +136,9 @@ const ChatInterface = () => {
             //     })
             // });
 
-            if (!response.ok) {
-                console.error('Failed to send message via REST API');
-            }
+            // if (!response.ok) {
+            //     console.error('Failed to send message via REST API');
+            // }
         } catch (error) {
             console.error('Error sending message:', error);
         }
