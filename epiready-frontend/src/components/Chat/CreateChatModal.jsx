@@ -12,6 +12,29 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
         fetchUsers();
     }, []);
 
+    const [currentUser, setCurrentUser] = useState(null);
+
+    const fetchCurrentUser = async () => {
+        const token = sessionStorage.getItem("token");
+        if (!token) return;
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `${token}`
+                }
+            });
+
+            if (response.ok) {
+                const userData = await response.json();
+                setCurrentUser(userData);
+            }
+        } catch (error) {
+            console.error('Error fetching current user:', error);
+        }
+    };
+
     const fetchUsers = async () => {
         const token = sessionStorage.getItem("token");
         if (!token) return;
@@ -25,12 +48,25 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
 
             if (response.ok) {
                 const usersData = await response.json();
-                setUsers(usersData);
+                const filteredUsers = chatType === 'group' 
+                    ? usersData.filter(user => user.id !== currentUser?.id)
+                    : usersData;
+                setUsers(filteredUsers);
             }
         } catch (error) {
             console.error('Error fetching users:', error);
         }
     };
+
+    useEffect(() => {
+        fetchCurrentUser();
+    }, []);
+
+    useEffect(() => {
+        if (currentUser) {
+            fetchUsers();
+        }
+    }, [currentUser, chatType]);
 
     const handleUserToggle = (userId) => {
         if (chatType === 'direct') {
@@ -104,7 +140,10 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
                                 type="radio"
                                 value="direct"
                                 checked={chatType === 'direct'}
-                                onChange={(e) => setChatType(e.target.value)}
+                                onChange={(e) => {
+                                    setChatType(e.target.value);
+                                    setSelectedUsers([]);
+                                }}
                             />
                             Direct Message
                         </label>
@@ -113,7 +152,10 @@ const CreateChatModal = ({ onClose, onChatCreated }) => {
                                 type="radio"
                                 value="group"
                                 checked={chatType === 'group'}
-                                onChange={(e) => setChatType(e.target.value)}
+                                onChange={(e) => {
+                                    setChatType(e.target.value);
+                                    setSelectedUsers([]);
+                                }}
                             />
                             Group Chat
                         </label>

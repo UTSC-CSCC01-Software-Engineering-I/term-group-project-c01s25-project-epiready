@@ -100,7 +100,7 @@ const ChatWindow = ({ selectedRoom, messages, onSendMessage }) => {
                             <div className={styles['message-content']}>
                                 <div className={styles['message-header']}>
                                     <span className={styles['sender-name']}>
-                                        {isOwnMessage(message) ? 'You' : message.sender_email}
+                                        {isOwnMessage(message) ? 'Me' : message.sender_email}
                                     </span>
                                     <span className={styles['message-time']}>
                                         {formatTime(message.created_at)}
