@@ -46,8 +46,11 @@ export default function ShowShipments() {
             return res.json();
         })
         .then(res => {
-            setShipments(res.shipments || []);
-            setTotalCount(res.total_count || 0);
+            const filteredShipments = (res.shipments || []).filter(
+                shipment => shipment.status !== 'completed' && shipment.status !== 'cancelled'
+            );
+            setShipments(filteredShipments);
+            setTotalCount(filteredShipments.length);
             setIsLoading(false);
         })
         .catch(() => {

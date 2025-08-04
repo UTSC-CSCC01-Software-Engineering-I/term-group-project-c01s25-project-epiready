@@ -114,6 +114,36 @@ def get_shipments_by_user(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@token_required
+def set_transit_status(user_id, shipment_id):
+    """
+    POST /shipments/<shipment_id>/transit_status
+    Set the transit status of a shipment. Only transporter managers can set transit status.
+
+    Possible Error Responses:
+    - 403 Forbidden: "Access denied. Only transporter managers can set transit status."
+    - 404 Not Found: "Shipment not found"
+    - 401 Unauthorized: "Session token was invalid."
+    """
+
+    user = User.query.get(user_id)
+
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+
+    data = request.get_json()
+    new_status = data.get('status')
+    if not new_status:
+        return jsonify({'error': 'Status is required'}), 400
+
+    print("NESTTTTT: ", new_status)
+    shipment.current_location = new_status
+    db.session.commit()
+    return jsonify(shipment.to_dict()), 200
+
+
 @token_required
 def get_all_shipments(user_id):
     """
