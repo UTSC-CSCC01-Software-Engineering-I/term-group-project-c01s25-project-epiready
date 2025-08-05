@@ -1,6 +1,6 @@
-import eventlet
-eventlet.monkey_patch()
-
+if __name__ == '__main__':
+    import eventlet
+    eventlet.monkey_patch()
 from flask import Flask, jsonify
 from flask_mail import Mail
 from flask_cors import CORS
@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from config.database import init_db, db
 import os
 from flask_migrate import Migrate
+from models import user, shipment, temperature, alert, weather, shipment_action, chat, organization
 
 load_dotenv()
 
@@ -21,7 +22,7 @@ def create_app():
 
     print("CORS_ORIGIN:", os.getenv("CORS_ORIGIN"))
 
-    CORS(app, origins=os.getenv("CORS_ORIGIN"), supports_credentials=True)
+    CORS(app, origins=[os.getenv("CORS_ORIGIN")], supports_credentials=True)
     init_db(app)
     
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
@@ -31,8 +32,9 @@ def create_app():
     app.config['MAIL_USE_TLS'] = True
     
     from socket_events import register_socketio_events
-    from models import user, shipment, temperature, alert, weather, shipment_action
-
+    
+    print("we are here")
+    
     migrate = Migrate(app, db)
     socketio.init_app(app)
     mail = Mail(app)
@@ -44,12 +46,20 @@ def create_app():
     return app
 
 app = create_app()
-
+ 
 @app.route("/health", methods=["GET"])
 def health_check():
     print("CORS_ORIGIN:", os.getenv("CORS_ORIGIN"))
 
     return jsonify(status="Healthy"), 200
 
-if __name__ == '__main__':
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'none';"
+    return response
+
+
+if __name__ == '__main__' and os.getenv("FLASK_ENV") == "development":
+
     socketio.run(app, debug=True)

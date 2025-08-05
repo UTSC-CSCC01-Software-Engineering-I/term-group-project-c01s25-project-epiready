@@ -18,6 +18,7 @@ class Shipment(db.Model):
     transit_time_hrs = db.Column(db.Integer, nullable=False)
     risk_factor = db.Column(db.String(50), nullable=False)
     mode_of_transport = db.Column(db.String(50), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=True)
 
     status = db.Column(db.String(20), nullable=False)  # active, completed, cancelled
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False)
@@ -53,7 +54,7 @@ class Shipment(db.Model):
         }
 
 @event.listens_for(Shipment, 'before_update')
-def validate_completed_shipment(target):
+def validate_completed_shipment(mapper, connection, target):
     if isinstance(target, Shipment):
         if target.status == 'completed' and not target.actual_arrival:
             target.actual_arrival = datetime.now(timezone.utc)

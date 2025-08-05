@@ -10,6 +10,8 @@ from auth.auth import token_required
 from flask_mail import Message, Mail
 import eventlet
 
+eventlet.monkey_patch()
+
 def parse_temp_range(temp_range):
     """Parses a string like '2 to 8' into (2.0, 8.0)."""
     try:
@@ -26,19 +28,22 @@ def humidity_threshold(level):
         'high': 40
     }.get(level.lower(), 100) 
 
-def create_weather_data(location, temperature, humidity=None, aqi=None, timestamp=None):
+def create_weather_data(user_id, shipment_id, location, internal_temp, external_temp, humidity, aqi=None, timestamp=None):
     """Create and save a WeatherData record to the database."""
     try:
         weather = WeatherData(
+            user_id=user_id,
+            shipment_id=shipment_id,
             location=location,
-            temperature=temperature,
+            internal_temp=internal_temp,
+            external_temp=external_temp,
             humidity=humidity,
             aqi=aqi,
             timestamp=timestamp or datetime.now(timezone.utc)
         )
         db.session.add(weather)
         db.session.commit()
-        return weather
+        return weather.to_dict()
     except Exception as e:
         db.session.rollback()
         print(f"Error creating weather data: {e}")
@@ -114,11 +119,11 @@ def start_temperature_monitor(socketio, app, mail):
                         breach_type = "Temp+Humidity"
                     else:
                         breach_type = "Humidity"
+                
+                severity = "low"
 
                 # Create alert in database if there's a breach and send email
                 if breach:                      
-                    
-                    severity = "low"
                     
                     temp_deviation = 0
                     if "Temp" in breach_type:
@@ -213,14 +218,15 @@ def start_temperature_monitor(socketio, app, mail):
                     'humidity': humidity,
                     'shipment_id': shipment.id,
                     'breach': breach,
-                    'breach_type': breach_type
+                    'breach_type': breach_type,
+                    'severity': severity,
                 }
-                create_weather_data(shipment.id, internal_temp, humidity, None, timestamp)
+                create_weather_data(shipment.user_id, shipment.id, str(lat) + " " + str(lon), internal_temp, external_temp, humidity, severity_rank(severity), timestamp)
                 socketio.emit('temperature_alert', data, room=str(shipment.user_id))
                 
                 # print(f"Event data sent to User with ID {shipment.user_id}: ", data)
 
-            eventlet.sleep(1000)
+            eventlet.sleep(200)
 
 @token_required
 def get_alerts_for_user(user_id):
@@ -260,6 +266,9 @@ def get_alerts_for_user(user_id):
         else:
             base_query = Alert.query.filter(Alert.shipment_id.in_(shipment_ids))
 
+        if active_filter:
+            base_query = base_query.filter(Alert.active == active_filter)
+
         # Get total count before pagination
         total_count = base_query.count()
 
@@ -284,6 +293,7 @@ def get_alerts_for_user(user_id):
             'total_count': total_count
         }), 200
     except Exception as e:
+        import traceback; traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @token_required

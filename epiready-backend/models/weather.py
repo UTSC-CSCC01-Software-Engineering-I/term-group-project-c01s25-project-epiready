@@ -5,8 +5,11 @@ class WeatherData(db.Model):
     __tablename__ = 'weather_data'
 
     id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(100), nullable=False)
-    temperature = db.Column(db.Float, nullable=False)
+    location = db.Column(db.String(100), nullable=True)
+    internal_temp = db.Column(db.Float, nullable=True)
+    external_temp = db.Column(db.Float, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Optional link to User
+    shipment_id = db.Column(db.String(50), db.ForeignKey('shipments.id'), nullable=True)  # Optional link to Shipment
     # optionally description of weather conditions, and humidity, wind speed if available
     humidity = db.Column(db.Float)
     aqi = db.Column(db.Float)
@@ -20,8 +23,11 @@ class WeatherData(db.Model):
         return {
             'id': self.id,
             'location': self.location,
-            'temperature': self.temperature,
+            'internal_temp': self.internal_temp,
+            'external_temp': self.external_temp,
             'humidity': self.humidity,
+            'user_id': self.user_id,
+            'shipment_id': self.shipment_id,
             'aqi': self.aqi,
             'timestamp': self.timestamp.isoformat()
         } 

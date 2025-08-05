@@ -10,6 +10,8 @@ import Track from "./pages/Track";
 import Shipments from "./pages/Shipments";
 import Monitor from "./pages/Monitor";
 import Alerts from "./pages/Alerts";
+import Organization from "./pages/Organization";
+import Chat from "./pages/Chat";
 import { GlobalProvider } from "./LoggedIn";
 import ShipmentPage from "./pages/ShipmentPage";
 import MapComponent from "./components/maps/MapComponent";
@@ -37,6 +39,8 @@ export default function App() {
         <Route path="/shipments" element={<Shipments />} />
         <Route path="/monitor" element={<Monitor />} />
         <Route path="/alerts" element={<Alerts />} />
+        <Route path="/organization" element={<Organization />} />
+        <Route path="/chat" element={<Chat />} />
         <Route path="/shipments/:name" element={<ShipmentPage />} />
         <Route path="/map" element={
           <MapComponent 

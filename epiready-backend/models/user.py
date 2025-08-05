@@ -10,6 +10,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='manufacturer')  # manufacturer, transporter, transporter_manager
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=True)
+    organization = db.relationship('Organization', backref='users', lazy=True)
 
     shipments = db.relationship('Shipment', backref='user', lazy=True)
 
@@ -18,7 +20,8 @@ class User(db.Model):
             "id": self.id, 
             "email": self.email, 
             "role": self.role,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
+            "organization_id": self.organization_id
         }
 
 def create_user(email: str, raw_password: str, role: str = 'manufacturer') -> User:

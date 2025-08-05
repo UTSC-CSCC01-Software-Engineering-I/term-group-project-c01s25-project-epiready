@@ -4,7 +4,7 @@ from models.shipment import Shipment
 from models.user import User
 from config.database import db
 from auth.auth import token_required
-import uuid
+from datetime import datetime, timezone
 
 @token_required
 def create_shipment_action(user_id):
@@ -39,8 +39,12 @@ def create_shipment_action(user_id):
         return jsonify({'error': 'Shipment not found'}), 404
     
     user = User.query.get(user_id)
+    if user.organization_id != shipment.organization_id:
+        return jsonify({'error': 'Access denied. Shipment is outside your organization.'}), 403
+
     if user.role != 'transporter_manager' and shipment.user_id != user_id:
-        return jsonify({'error': 'Access denied. You can only create actions for your own shipments.'}), 403
+        return jsonify({'error': 'Access denied. You can only access your own shipments.'}), 403
+
     
     data = request.get_json()
     required_fields = ['action_type', 'description']
@@ -70,7 +74,7 @@ def create_shipment_action(user_id):
 @token_required
 def get_shipment_actions(user_id):
     """
-    GET /actions
+    GET /actions?shipment_id=<shipment_id>
     
     Get all actions for a specific shipment.
     - Regular users: Can only access actions for their own shipments
@@ -82,8 +86,7 @@ def get_shipment_actions(user_id):
     - 401 Unauthorized: "Session token was invalid."
     """
     
-    data = request.get_json()
-    shipment_id = data.get("shipment_id")
+    shipment_id = request.args.get("shipment_id")
     if not shipment_id:
         return jsonify({'error': 'Shipment ID is required'}), 400
     
@@ -94,8 +97,11 @@ def get_shipment_actions(user_id):
     
     # Check access permissions
     user = User.query.get(user_id)
+    if user.organization_id != shipment.organization_id:
+        return jsonify({'error': 'Access denied. Shipment is outside your organization.'}), 403
+
     if user.role != 'transporter_manager' and shipment.user_id != user_id:
-        return jsonify({'error': 'Access denied. You can only view actions for your own shipments.'}), 403
+        return jsonify({'error': 'Access denied. You can only access your own shipments.'}), 403
     
     try:
         actions = ShipmentAction.query.filter_by(shipment_id=shipment_id).order_by(ShipmentAction.created_at.desc()).all()
@@ -132,8 +138,11 @@ def get_action_by_id(user_id, action_id):
     
     # Check access permissions
     user = User.query.get(user_id)
+    if user.organization_id != shipment.organization_id:
+        return jsonify({'error': 'Access denied. Shipment is outside your organization.'}), 403
+
     if user.role != 'transporter_manager' and shipment.user_id != user_id:
-        return jsonify({'error': 'Access denied. You can only view actions for your own shipments.'}), 403
+        return jsonify({'error': 'Access denied. You can only access your own shipments.'}), 403
     
     try:
         action = ShipmentAction.query.filter_by(id=action_id, shipment_id=shipment_id).first()
@@ -176,8 +185,11 @@ def update_action_status(user_id, action_id):
     
     # Check access permissions
     user = User.query.get(user_id)
+    if user.organization_id != shipment.organization_id:
+        return jsonify({'error': 'Access denied. Shipment is outside your organization.'}), 403
+
     if user.role != 'transporter_manager' and shipment.user_id != user_id:
-        return jsonify({'error': 'Access denied. You can only update actions for your own shipments.'}), 403
+        return jsonify({'error': 'Access denied. You can only access your own shipments.'}), 403
     
     data = request.get_json()
     if 'status' not in data:
@@ -189,6 +201,8 @@ def update_action_status(user_id, action_id):
             return jsonify({'error': 'Action not found'}), 404
         
         action.status = data['status']
+        if action.status == 'completed' and not action.completed_at:
+            action.completed_at = datetime.now(timezone.utc)
         if 'action_metadata' in data:
             action.action_metadata = data['action_metadata']
         
@@ -205,7 +219,7 @@ def get_user_action_history(auth_user_id, user_id):
     
     Get all actions for the authenticated user across all their shipments.
     - Regular users: Can only access their own actions
-    - Transporter managers: Can access actions for any user
+    - Transporter managers: Can access actions for any user within organization
     
     Query Parameters:
     - action_type (optional): Filter actions by type
@@ -224,7 +238,9 @@ def get_user_action_history(auth_user_id, user_id):
     auth_user = User.query.get(auth_user_id)
     if auth_user.role != "transporter_manager" and auth_user_id != user_id:
         return jsonify({"error": "Access denied. You can only view your own actions."}), 403
-
+    
+    if auth_user.organization_id != user_id.organization_id:
+        return jsonify({"error": "Access denied. You can only view actions of users within your organization."}), 403
     
     try:
         action_type = request.args.get('action_type')
@@ -232,7 +248,7 @@ def get_user_action_history(auth_user_id, user_id):
         limit = min(int(request.args.get('limit', 50)), 200)
         offset = int(request.args.get('offset', 0))
         
-        user_shipments = Shipment.query.filter_by(user_id=request_user_id).all()
+        user_shipments = Shipment.query.filter_by(user_id=request_user_id, organization_id=auth_user.organization_id).all()
         shipment_ids = [s.id for s in user_shipments]
         
         if not shipment_ids:
@@ -262,3 +278,79 @@ def get_user_action_history(auth_user_id, user_id):
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500 
+
+@token_required
+def create_shipment_action_by_id(user_id, shipment_id):
+    """
+    POST /<shipment_id>/actions
+    
+    Creates a new action for a specific shipment using shipment_id from URL.
+    """
+    
+    # Check if shipment exists and user has access
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+    
+    user = User.query.get(user_id)
+    if user.organization_id != shipment.organization_id:
+        return jsonify({'error': 'Access denied. Shipment is outside your organization.'}), 403
+
+    if user.role != 'transporter_manager' and shipment.user_id != user_id:
+        return jsonify({'error': 'Access denied. You can only access your own shipments.'}), 403
+    
+    data = request.get_json()
+    
+    # Allow either 'action' or 'action_type' field
+    if 'action' in data:
+        data['action_type'] = data['action']
+    
+    required_fields = ['action_type', 'description']
+    missing = [field for field in required_fields if field not in data]
+    if missing:
+        return jsonify({'error': f'Missing fields: {", ".join(missing)}'}), 400
+    
+    try:
+        action = ShipmentAction(
+            shipment_id=shipment_id,
+            user_id=user_id,
+            action_type=data['action_type'],
+            description=data['description'],
+            status=data.get('status', 'active'),
+            action_metadata=data.get('action_metadata')
+        )
+        
+        db.session.add(action)
+        db.session.commit()
+        
+        return jsonify(action.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@token_required
+def get_shipment_actions_by_id(user_id, shipment_id):
+    """
+    GET /<shipment_id>/actions
+    
+    Get all actions for a specific shipment using shipment_id from URL.
+    """
+    
+    # Check if shipment exists
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({'error': 'Shipment not found'}), 404
+    
+    # Check access permissions
+    user = User.query.get(user_id)
+    if user.organization_id != shipment.organization_id:
+        return jsonify({'error': 'Access denied. Shipment is outside your organization.'}), 403
+
+    if user.role != 'transporter_manager' and shipment.user_id != user_id:
+        return jsonify({'error': 'Access denied. You can only access your own shipments.'}), 403
+    
+    try:
+        actions = ShipmentAction.query.filter_by(shipment_id=shipment_id).order_by(ShipmentAction.created_at.desc()).all()
+        return jsonify([action.to_dict() for action in actions]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
