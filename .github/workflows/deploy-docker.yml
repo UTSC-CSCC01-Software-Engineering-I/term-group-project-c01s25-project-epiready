@@ -1,8 +1,8 @@
 name: Deploy App and Test
 on:
-  workflow_run:
-    workflows: ["Publish Project Backend to Dockerhub", "Publish Project Frontend to Dockerhub"]
-    types: [completed]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 jobs:
   deploy:
@@ -20,6 +20,7 @@ jobs:
         port: 22
         envs: GIT_TAG
         script: |
+          sleep 150
           cd epiready
           git fetch --tags
           TAG_NO_V=${GIT_TAG#v}
