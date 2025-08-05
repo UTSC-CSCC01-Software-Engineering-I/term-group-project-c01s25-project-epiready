@@ -48,7 +48,7 @@ Triggered only when a Git **tag is pushed** (e.g., `v1.0.0`).
 
 ### **Triggering Deployment Workflow**
 
-A **workflow file** (`deploy-docker.yml`) is triggered **after build-backend.yml and build-frontend.yml are run succesfully.** This only runs when the other workflow files are run in the main branch, not before it.
+A **workflow file** (`deploy-docker.yml`) is triggered and sleeps for 2 minutes giving enought time for other files to push image. This only runs when the other workflow files are run in the main branch, not before it.
 
 ### 1. **SSH Into VM**
 
