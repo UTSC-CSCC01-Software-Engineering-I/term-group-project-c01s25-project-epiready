@@ -2,8 +2,7 @@ name: Deploy App and Test
 on:
   workflow_run:
     workflows: ["Publish Project Backend to Dockerhub", "Publish Project Frontend to Dockerhub"]
-    types:
-      - completed
+    types: [completed]
   workflow_dispatch:
 jobs:
   deploy:
